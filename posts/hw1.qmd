@@ -4,7 +4,16 @@ subtitle: "Simulating Key Ideas from Classical Frequentist Statistics"
 author: "Zejun Jiang"
 date: 2026-04-15
 categories: [statistics, A/B testing, simulation]
+format:
+  html:
+    embed-resources: false
 ---
+
+```{python}
+#| include: false
+import matplotlib
+matplotlib.use("Agg")
+```
 
 ## Introduction
 
@@ -286,18 +295,21 @@ The coefficients have clean interpretations:
 - $\beta_1 = \pi_A - \pi_B = \theta$ — exactly the quantity we've been estimating all along.
 
 ```{python}
+#| warning: false
+
 from scipy.stats import t as t_dist
 
-Y = np.concatenate([group_A, group_B])
-D = np.concatenate([np.ones(n), np.zeros(n)])
+Y = np.concatenate([group_A, group_B]).astype(float)
+D = np.concatenate([np.ones(n), np.zeros(n)]).astype(float)
 
-X = np.column_stack([np.ones(2 * n), D])
+X = np.column_stack([np.ones(2 * n, dtype=float), D])
 beta_hat = np.linalg.lstsq(X, Y, rcond=None)[0]
 beta0, beta1 = beta_hat
 
 residuals = Y - X @ beta_hat
-sigma2 = (residuals ** 2).sum() / (2 * n - 2)
-cov_beta = sigma2 * np.linalg.inv(X.T @ X)
+sigma2 = float((residuals ** 2).sum()) / (2 * n - 2)
+XtX_inv = np.linalg.inv(X.T @ X)
+cov_beta = sigma2 * XtX_inv
 se_beta1 = np.sqrt(cov_beta[1, 1])
 t_stat = beta1 / se_beta1
 p_reg  = 2 * t_dist.sf(abs(t_stat), df=2 * n - 2)
