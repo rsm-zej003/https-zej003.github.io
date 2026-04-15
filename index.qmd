@@ -21,11 +21,10 @@ Welcome to my website
 - Data Visualization
 
 ## Interests
-- Analog Circuit Design
-- Machine learning
-- Marketing analytics
-- Product strategy
-
+- Food
+- Travel
+- Photography
+- Video Games
 
 ## Links
 

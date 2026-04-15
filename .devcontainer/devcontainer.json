@@ -4,7 +4,7 @@
     "docker-compose-k8s.yml"
   ],
   "service": "rsm-msba",
-  "workspaceFolder": "/home/jovyan/git",
+  "workspaceFolder": "/home/jovyan/git/MGTA463R",
   "remoteUser": "jovyan",
   "overrideCommand": false,
   "shutdownAction": "none",
