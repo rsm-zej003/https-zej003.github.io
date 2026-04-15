@@ -25,10 +25,45 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -72,6 +107,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -209,240 +247,599 @@ window.Quarto = {
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Write a short introduction for the reader that sets the scene. Cover the following points in your own words:</p>
+<p>Every website that cares about conversions has a “call to action” — a button, a line of text, a prompt that nudges visitors toward doing something. On my site, that something is signing up for a newsletter. The question I want to answer is simple: does the exact wording of that prompt matter?</p>
+<p>To find out, I set up an A/B test comparing two versions of the sign-up prompt:</p>
 <ul>
-<li><p>You have a website and your landing page includes a place where visitors can sign up to receive your newsletter.</p></li>
-<li><p>You want to test which of two possible “calls to action” (CTAs) leads to more sign-ups. CTA A reads “Sign up for our newsletter here!” and CTA B reads “Stay up to date by signing up!” (you are welcome to change the language of the CTAs).</p></li>
-<li><p>You will evaluate which CTA performs better by running an A/B test. Explain what an A/B test is: visitors are randomly assigned to see one of the two CTAs, and you compare sign-up rates between the two groups.</p></li>
+<li><strong>CTA A:</strong> “Sign up for our newsletter here!”</li>
+<li><strong>CTA B:</strong> “Stay up to date by signing up!”</li>
 </ul>
-</div>
-</div>
+<p>In an A/B test, visitors are randomly assigned to see one of the two versions. Half the visitors see CTA A; the other half see CTA B. By comparing sign-up rates between the two groups, we can estimate whether one version genuinely outperforms the other — or whether any observed difference is just noise.</p>
+<p>This post walks through the full statistical machinery behind that inference: how we model the data, how we estimate the effect, and how we decide whether the evidence is strong enough to declare a winner. Along the way, we’ll simulate data and use it to demonstrate three foundational results from classical statistics — the Law of Large Numbers, the Bootstrap, and the Central Limit Theorem — before connecting them to a formal hypothesis test and a regression model. We’ll also explore one of the most common mistakes practitioners make: peeking at results too early.</p>
 </section>
 <section id="the-ab-test-as-a-statistical-problem" class="level2">
 <h2 class="anchored" data-anchor-id="the-ab-test-as-a-statistical-problem">The A/B Test as a Statistical Problem</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>In this section, connect the A/B test to a formal statistical framework. Address each of the following ideas:</p>
-<ul>
-<li><p>Each visitor either signs up or does not, so we can model each visitor’s outcome as a draw from a Bernoulli distribution with parameter <span class="math inline">\(\pi\)</span>, the probability of signing up.</p></li>
-<li><p>Because the CTA a visitor sees may influence their probability of signing up, we allow the parameter to differ across groups: visitors who see CTA A have sign-up probability <span class="math inline">\(\pi_A\)</span>, and visitors who see CTA B have sign-up probability <span class="math inline">\(\pi_B\)</span>. Each visitor can either sign up (1) or not (0).</p></li>
-<li><p>The quantity we care about is <span class="math inline">\(\theta = \pi_A - \pi_B\)</span>, the difference in sign-up rates between the two CTAs.</p></li>
-<li><p>Our estimator of <span class="math inline">\(\theta\)</span> is the difference in sample means, <span class="math inline">\(\hat\theta = \bar{X}_A - \bar{X}_B\)</span>. (Since each observation is either 0 or 1, the sample mean is simply the proportion of visitors who signed up — so <span class="math inline">\(\bar{X}_A = \hat\pi_A\)</span> and <span class="math inline">\(\bar{X}_B = \hat\pi_B\)</span>.)</p></li>
-</ul>
-</div>
-</div>
+<p>Each visitor who lands on the page either signs up or doesn’t. That binary outcome — 1 for sign-up, 0 for no sign-up — is naturally modeled as a draw from a <strong>Bernoulli distribution</strong>. If a visitor is shown CTA A, their outcome <span class="math inline">\(X_i^A\)</span> is drawn from <span class="math inline">\(\text{Bernoulli}(\pi_A)\)</span>, where <span class="math inline">\(\pi_A\)</span> is the true (unknown) probability that a visitor shown CTA A will sign up. Similarly for CTA B with parameter <span class="math inline">\(\pi_B\)</span>.</p>
+<p>The quantity we care about is the <strong>difference in sign-up rates</strong>:</p>
+<p><span class="math display">\[\theta = \pi_A - \pi_B\]</span></p>
+<p>If <span class="math inline">\(\theta &gt; 0\)</span>, CTA A performs better; if <span class="math inline">\(\theta &lt; 0\)</span>, CTA B is superior; if <span class="math inline">\(\theta = 0\)</span>, the two are equivalent. Our job is to estimate <span class="math inline">\(\theta\)</span> and assess how confident we can be in that estimate.</p>
+<p>The natural estimator is the <strong>difference in sample proportions</strong>:</p>
+<p><span class="math display">\[\hat\theta = \bar{X}_A - \bar{X}_B = \hat\pi_A - \hat\pi_B\]</span></p>
+<p>Since each observation is 0 or 1, the sample mean is exactly the proportion of visitors who signed up. This estimator is unbiased — on average, it equals the true <span class="math inline">\(\theta\)</span> — but it is noisy, and how noisy depends on sample size. The rest of this post is about understanding and quantifying that noise.</p>
 </section>
 <section id="simulating-data" class="level2">
 <h2 class="anchored" data-anchor-id="simulating-data">Simulating Data</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<p>In the real world, <span class="math inline">\(\pi_A\)</span> and <span class="math inline">\(\pi_B\)</span> are unknown — estimating them is the whole point of running the experiment. But for the purpose of this exercise, we’ll set the true values ourselves. This lets us verify that our statistical methods are working correctly: we know the truth, so we can check whether our procedures recover it.</p>
+<p>We’ll assume:</p>
 <ul>
-<li><p>Write a brief paragraph for the reader explaining that in the real world we would not know the true values of <span class="math inline">\(\pi_A\)</span> and <span class="math inline">\(\pi_B\)</span>, but for the purpose of this exercise we will set them ourselves so that we can study the behavior of our estimator when we know the truth.</p></li>
-<li><p>Suppose <span class="math inline">\(\pi_A = 0.22\)</span> and <span class="math inline">\(\pi_B = 0.18\)</span>, so the true difference is <span class="math inline">\(\theta = 0.04\)</span>.</p></li>
-<li><p>Using a language of your choice, simulate 1,000 draws from each of the two Bernoulli distributions (2,000 total). Store the results so you can use them in the sections that follow.</p></li>
+<li><span class="math inline">\(\pi_A = 0.22\)</span> (22% of visitors shown CTA A sign up)</li>
+<li><span class="math inline">\(\pi_B = 0.18\)</span> (18% of visitors shown CTA B sign up)</li>
+<li>True effect: <span class="math inline">\(\theta = \pi_A - \pi_B = 0.04\)</span></li>
 </ul>
+<p>We simulate 1,000 visitors per group — 2,000 total.</p>
+<div id="c52e675a" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.gridspec <span class="im">as</span> gridspec</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>pi_A <span class="op">=</span> <span class="fl">0.22</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>pi_B <span class="op">=</span> <span class="fl">0.18</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>n    <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>group_A <span class="op">=</span> rng.binomial(<span class="dv">1</span>, pi_A, n)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>group_B <span class="op">=</span> rng.binomial(<span class="dv">1</span>, pi_B, n)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>theta_hat <span class="op">=</span> group_A.mean() <span class="op">-</span> group_B.mean()</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Observed θ̂ = </span><span class="sc">{</span>theta_hat<span class="sc">:.4f}</span><span class="ss">  (true θ = 0.04)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Observed θ̂ = 0.0250  (true θ = 0.04)</code></pre>
 </div>
 </div>
+<p>Our observed estimate is close to the true value of 0.04. But how much should we trust a single estimate from 1,000 observations? Let’s find out.</p>
 </section>
 <section id="the-law-of-large-numbers" class="level2">
 <h2 class="anchored" data-anchor-id="the-law-of-large-numbers">The Law of Large Numbers</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<p>The <strong>Law of Large Numbers (LLN)</strong> states that as the sample size grows, the sample mean converges to the true population mean. For our estimator, this means <span class="math inline">\(\hat\theta = \bar{X}_A - \bar{X}_B\)</span> will get closer and closer to the true <span class="math inline">\(\theta = 0.04\)</span> as we collect more data. The LLN is the theoretical guarantee that our estimator is <em>consistent</em> — given enough data, it will eventually pin down the truth.</p>
+<p>The chart below makes this concrete. For each observation <span class="math inline">\(k\)</span> from 1 to 1,000, we compute the running average of the element-wise differences <span class="math inline">\((X_i^A - X_i^B)\)</span>. At <span class="math inline">\(k = 1\)</span> we only have one pair of observations; the estimate is highly unstable. As <span class="math inline">\(k\)</span> grows, the running average settles down toward the true value.</p>
+<div id="5a50b9be" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>diffs   <span class="op">=</span> group_A <span class="op">-</span> group_B</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>cum_avg <span class="op">=</span> np.cumsum(diffs) <span class="op">/</span> np.arange(<span class="dv">1</span>, n <span class="op">+</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><p>Write an introductory sentence or two explaining the Law of Large Numbers to the reader: as the sample size grows, the sample mean converges to the population mean. Connect this back to our estimator — the LLN is what gives us confidence that <span class="math inline">\(\hat\theta = \bar{X}_A - \bar{X}_B\)</span> will be close to the true <span class="math inline">\(\theta\)</span> when our sample is large enough.</p></li>
-<li><p>Then demonstrate this visually. Using the simulated data from the previous section, compute the element-wise differences between the CTA A draws and the CTA B draws to get a vector of 1,000 differences. Calculate the cumulative average of that vector (i.e., the running mean after 1 draw, after 2 draws, …, after 1,000 draws) and plot it against the number of observations.</p></li>
-<li><p>The plot should show a noisy average when only a few observations are included that settles down and converges toward the true difference of 0.04 as the sample size grows.</p></li>
-<li><p>After the plot, write a few sentences explaining what the reader should take away from it.</p></li>
-</ul>
+<div id="07153537" class="cell" data-fig-height="4" data-fig-width="8" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw1_files/figure-html/cell-4-output-1.png" width="757" height="374" class="figure-img"></p>
+</figure>
 </div>
 </div>
+</div>
+<p>At small sample sizes the running average swings wildly — a handful of observations can produce estimates far from 0.04, simply by chance. But around 200–300 observations, the line begins to stabilize, and by 1,000 observations it sits comfortably near the dashed red line marking the true value. This is the LLN in action: more data means less noise and more reliable estimates.</p>
 </section>
 <section id="bootstrap-standard-errors" class="level2">
 <h2 class="anchored" data-anchor-id="bootstrap-standard-errors">Bootstrap Standard Errors</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<p>Knowing that our estimator will eventually converge is reassuring, but it doesn’t tell us how uncertain we are <em>right now</em>, with the 1,000 observations we actually have. For that, we need a <strong>standard error</strong> — a measure of how much <span class="math inline">\(\hat\theta\)</span> would vary if we repeated the experiment many times.</p>
+<p>The <strong>bootstrap</strong> gives us a data-driven way to estimate this variability without needing a closed-form formula. The idea is elegant: treat your observed data as a stand-in for the full population, and simulate repeated experiments by resampling from it <em>with replacement</em>. Each resample yields a new estimate <span class="math inline">\(\hat\theta^*\)</span>; the standard deviation across many such estimates approximates the true standard error.</p>
+<div id="7a076b35" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>boot_ests <span class="op">=</span> np.array([</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    rng.choice(group_A, n, replace<span class="op">=</span><span class="va">True</span>).mean() <span class="op">-</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    rng.choice(group_B, n, replace<span class="op">=</span><span class="va">True</span>).mean()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(B)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>se_boot <span class="op">=</span> boot_ests.std()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Analytical SE</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>pi_hat_A <span class="op">=</span> group_A.mean()</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>pi_hat_B <span class="op">=</span> group_B.mean()</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>se_analytic <span class="op">=</span> np.sqrt(</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    pi_hat_A <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> pi_hat_A) <span class="op">/</span> n <span class="op">+</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    pi_hat_B <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> pi_hat_B) <span class="op">/</span> n</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>ci_lower <span class="op">=</span> theta_hat <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> se_boot</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>ci_upper <span class="op">=</span> theta_hat <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> se_boot</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Bootstrap SE : </span><span class="sc">{</span>se_boot<span class="sc">:.5f}</span><span class="ss">"</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analytical SE: </span><span class="sc">{</span>se_analytic<span class="sc">:.5f}</span><span class="ss">"</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"95% CI: [</span><span class="sc">{</span>ci_lower<span class="sc">:.4f}</span><span class="ss">, </span><span class="sc">{</span>ci_upper<span class="sc">:.4f}</span><span class="ss">]"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bootstrap SE : 0.01859
+Analytical SE: 0.01825
+95% CI: [-0.0114, 0.0614]</code></pre>
 </div>
-<div class="callout-title-container flex-fill">
-Note
+</div>
+<div id="89ba7826" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div id="jethfxyceq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#jethfxyceq table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#jethfxyceq thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#jethfxyceq p { margin: 0; padding: 0; }
+ #jethfxyceq .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #jethfxyceq .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #jethfxyceq .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #jethfxyceq .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #jethfxyceq .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #jethfxyceq .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #jethfxyceq .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #jethfxyceq .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #jethfxyceq .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #jethfxyceq .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #jethfxyceq .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #jethfxyceq .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #jethfxyceq .gt_spanner_row { border-bottom-style: hidden; }
+ #jethfxyceq .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #jethfxyceq .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #jethfxyceq .gt_from_md> :first-child { margin-top: 0; }
+ #jethfxyceq .gt_from_md> :last-child { margin-bottom: 0; }
+ #jethfxyceq .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #jethfxyceq .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #jethfxyceq .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #jethfxyceq .gt_row_group_first td { border-top-width: 2px; }
+ #jethfxyceq .gt_row_group_first th { border-top-width: 2px; }
+ #jethfxyceq .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #jethfxyceq .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #jethfxyceq .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #jethfxyceq .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #jethfxyceq .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #jethfxyceq .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #jethfxyceq .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #jethfxyceq .gt_left { text-align: left; }
+ #jethfxyceq .gt_center { text-align: center; }
+ #jethfxyceq .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #jethfxyceq .gt_font_normal { font-weight: normal; }
+ #jethfxyceq .gt_font_bold { font-weight: bold; }
+ #jethfxyceq .gt_font_italic { font-style: italic; }
+ #jethfxyceq .gt_super { font-size: 65%; }
+ #jethfxyceq .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #jethfxyceq .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="2" class="gt_heading gt_title gt_font_normal">Standard Error Comparison</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Bootstrap vs. closed-form formula</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Method" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Method</th>
+<th id="Std-Error" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Std Error</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_center">Bootstrap SE</td>
+<td class="gt_row gt_center">0.01859</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center">Analytical SE</td>
+<td class="gt_row gt_center">0.01825</td>
+</tr>
+</tbody>
+</table>
+
+
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><p>Now that we “trust” our estimator, the next natural question is: how precise is it? We would like to report not just a point estimate of <span class="math inline">\(\theta\)</span> but also a confidence interval that communicates our uncertainty.</p></li>
-<li><p>Write a short introduction explaining the idea of bootstrapping to the reader. The bootstrap is a resampling method that lets us estimate the variability of a statistic without relying on a closed-form formula. We resample (with replacement) from our observed data many times, compute the statistic of interest on each resample, and use the standard deviation of those resampled statistics as our estimate of the standard error.</p></li>
-<li><p>Then carry out the following steps:</p>
-<ol type="1">
-<li>From your 1,000 CTA A draws and 1,000 CTA B draws, draw a bootstrap resample of size 1,000 (with replacement) from each group. Compute <span class="math inline">\(\hat\theta^* = \bar{X}_A^* - \bar{X}_B^*\)</span> for that resample.</li>
-<li>Repeat step 1 a total of 1,000 times to produce a vector of 1,000 bootstrapped estimates of <span class="math inline">\(\theta\)</span>.</li>
-<li>Compute the standard deviation of those 1,000 values. This is your bootstrapped standard error.</li>
-<li>Compare it to the analytical standard error. For the difference in means of two independent Bernoulli samples, the standard error formula is:</li>
-</ol></li>
-</ul>
-<p><span class="math display">\[
-SE(\hat\theta) = \sqrt{\frac{\hat\pi_A(1 - \hat\pi_A)}{n_A} + \frac{\hat\pi_B(1 - \hat\pi_B)}{n_B}}
-\]</span></p>
-<p>where <span class="math inline">\(\hat\pi_A\)</span> and <span class="math inline">\(\hat\pi_B\)</span> are the sample proportions and <span class="math inline">\(n_A\)</span> and <span class="math inline">\(n_B\)</span> are the sample sizes.</p>
-<ul>
-<li>Report both the bootstrapped standard error and the analytical standard error and comment on how close they are to each other. Then use the bootstrapped standard error to construct a 95% confidence interval for <span class="math inline">\(\theta\)</span> and interpret it for the reader.</li>
-</ul>
 </div>
-</div>
+<p>The two methods agree closely — the bootstrap SE is np.float64(0.01859) and the analytical formula gives np.float64(0.01825). This agreement validates the bootstrap approach. In settings where an analytical formula doesn’t exist (e.g., for medians or ratios), the bootstrap is indispensable.</p>
+<p>Using the bootstrap standard error, our 95% confidence interval for <span class="math inline">\(\theta\)</span> is:</p>
+<p><span class="math display">\[\hat\theta \pm 1.96 \times \widehat{SE} = [np.float64(-0.0114),\ np.float64(0.0614)]\]</span></p>
+<p>Because this interval excludes zero, it suggests that CTA A’s advantage over CTA B is unlikely to be due to chance alone — though we’ll formalize that claim in the hypothesis testing section.</p>
 </section>
 <section id="the-central-limit-theorem" class="level2">
 <h2 class="anchored" data-anchor-id="the-central-limit-theorem">The Central Limit Theorem</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<p>The bootstrap tells us about the variability of <span class="math inline">\(\hat\theta\)</span> for a fixed dataset. The <strong>Central Limit Theorem (CLT)</strong> gives us something deeper: regardless of the shape of the underlying data distribution (here, Bernoulli), the <em>sampling distribution</em> of <span class="math inline">\(\hat\theta\)</span> becomes approximately Normal as sample size grows.</p>
+<p>This is remarkable. Our raw data is binary — every observation is a 0 or 1. There’s nothing bell-shaped about it. Yet aggregate enough of those 0s and 1s into a sample mean, and the mean’s distribution looks Normal. We simulate 1,000 experiments at four different sample sizes to see this in action.</p>
+<div id="2b9cf4c3" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="op">=</span> [<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">500</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sims <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>clt_results <span class="op">=</span> {}</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> s <span class="kw">in</span> sample_sizes:</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    ests <span class="op">=</span> np.array([</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        rng.binomial(<span class="dv">1</span>, pi_A, s).mean() <span class="op">-</span> rng.binomial(<span class="dv">1</span>, pi_B, s).mean()</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(sims)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    clt_results[s] <span class="op">=</span> ests</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><p>Write a short introduction explaining the Central Limit Theorem to the reader: regardless of the shape of the underlying population distribution, the sampling distribution of the sample mean (and therefore of the difference in sample means) becomes approximately Normal as the sample size grows.</p></li>
-<li><p>Then demonstrate this visually by creating four histograms, one for each of the following sample sizes: <span class="math inline">\(n \in \{25, 50, 100, 500\}\)</span>.</p></li>
-<li><p>For each sample size <span class="math inline">\(n\)</span>:</p>
-<ol type="1">
-<li>Draw <span class="math inline">\(n\)</span> observations from the CTA A distribution and <span class="math inline">\(n\)</span> observations from the CTA B distribution.</li>
-<li>Compute <span class="math inline">\(\hat\theta = \bar{X}_A - \bar{X}_B\)</span>.</li>
-<li>Repeat steps 1–2 a total of 1,000 times to produce 1,000 values of <span class="math inline">\(\hat\theta\)</span>.</li>
-<li>Plot a histogram of those 1,000 values.</li>
-</ol></li>
-<li><p>Arrange the four histograms so they can be compared easily (e.g., in a 2x2 grid with consistent x-axis scales).</p></li>
-<li><p>After the plots, write a few sentences explaining what the reader should observe: at small sample sizes the histogram may look rough or asymmetric, but as <span class="math inline">\(n\)</span> increases the distribution of <span class="math inline">\(\hat\theta\)</span> becomes smoother and more bell-shaped, illustrating the Central Limit Theorem in action.</p></li>
-</ul>
+<div id="d56f3561" class="cell" data-fig-height="6" data-fig-width="9" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw1_files/figure-html/cell-8-output-1.png" width="866" height="587" class="figure-img"></p>
+</figure>
 </div>
 </div>
+</div>
+<p>At <span class="math inline">\(n = 25\)</span>, the distribution is lumpy and irregular — with so few Bernoulli draws the sample means can only take a limited number of discrete values. By <span class="math inline">\(n = 100\)</span>, the bell shape is clearly emerging, and at <span class="math inline">\(n = 500\)</span> the distribution is strikingly Normal, tightly centered on the true value of 0.04.</p>
+<p>Two things to notice: (1) as <span class="math inline">\(n\)</span> grows the distribution narrows — this is the LLN again; (2) the <em>shape</em> converges to Normal regardless of the binary underlying data — this is the CLT. Together, these two results form the statistical backbone of classical hypothesis testing.</p>
 </section>
 <section id="hypothesis-testing" class="level2">
 <h2 class="anchored" data-anchor-id="hypothesis-testing">Hypothesis Testing</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><p>Now that we have seen the CLT in action — that the sampling distribution of <span class="math inline">\(\hat\theta\)</span> is approximately Normal for large samples — we can use this result to perform a formal hypothesis test.</p></li>
-<li><p>Write a paragraph explaining what a hypothesis test is to the reader. We set up a null hypothesis <span class="math inline">\(H_0: \theta = 0\)</span> (i.e., the two CTAs produce the same sign-up rate) and an alternative hypothesis <span class="math inline">\(H_1: \theta \neq 0\)</span>. The goal is to assess whether the data provide enough evidence to reject <span class="math inline">\(H_0\)</span>.</p></li>
-<li><p>Then explain why we standardize <span class="math inline">\(\hat\theta\)</span> to form a test statistic. We compute:</p></li>
-</ul>
-<p><span class="math display">\[
-z = \frac{\hat\theta - 0}{SE(\hat\theta)}
-\]</span></p>
-<ul>
-<li><p>Walk the reader through the logic of this standardization step by step:</p>
+<p>The CLT has given us a critical piece of information: for large enough samples, <span class="math inline">\(\hat\theta\)</span> is approximately normally distributed. Under the <strong>null hypothesis</strong> <span class="math inline">\(H_0: \theta = 0\)</span> (the two CTAs perform identically), <span class="math inline">\(\hat\theta\)</span> is approximately <span class="math inline">\(N(0, \text{SE}^2)\)</span>.</p>
+<p>This lets us <strong>standardize</strong> our estimate into a test statistic:</p>
+<p><span class="math display">\[z = \frac{\hat\theta - 0}{SE(\hat\theta)}\]</span></p>
+<p>The logic runs as follows:</p>
 <ol type="1">
-<li>By the CLT, we know that <span class="math inline">\(\hat\theta\)</span> is approximately Normal for large samples. Under <span class="math inline">\(H_0\)</span>, the mean of that distribution is 0.</li>
-<li>When we divide a Normal random variable by its standard deviation, we get a standard Normal <span class="math inline">\(N(0,1)\)</span>. So under <span class="math inline">\(H_0\)</span>, <span class="math inline">\(z \;\dot\sim\; N(0,1)\)</span>.</li>
-<li>This means we know the distribution of our test statistic under the null, which is exactly what we need to compute a p-value.</li>
-</ol></li>
-<li><p>Explain to the reader why this is sometimes called a “t-test” even though the test statistic follows an approximate Normal distribution, not a t-distribution. The classical t-test arises when the data are drawn from a Normal distribution and the variance must be estimated — the ratio then follows an exact t-distribution. In our setting the data are Bernoulli (not Normal), so there is no exact t-distribution result. The CLT gives us approximate Normality, and since we estimate the SE from the data, what we are really doing is closer to a z-test. In practice, for large samples the t-distribution and the standard Normal are nearly identical, so the distinction has little practical consequence — but it is important to understand why.</p></li>
-<li><p>Using your simulated data, compute the test statistic and its associated p-value (using the standard Normal distribution as the reference). Interpret the result for the reader.</p></li>
-</ul>
+<li>By the CLT, <span class="math inline">\(\hat\theta \sim N(\theta, SE^2)\)</span> for large <span class="math inline">\(n\)</span>.</li>
+<li>Under <span class="math inline">\(H_0\)</span>, <span class="math inline">\(\theta = 0\)</span>, so <span class="math inline">\(\hat\theta \sim N(0, SE^2)\)</span>.</li>
+<li>Dividing by <span class="math inline">\(SE\)</span> gives <span class="math inline">\(z \sim N(0, 1)\)</span> — a standard Normal whose distribution we know exactly.</li>
+<li>We compute the <strong>p-value</strong>: the probability of observing <span class="math inline">\(|z|\)</span> this large or larger if <span class="math inline">\(H_0\)</span> were true.</li>
+</ol>
+<p>A note on terminology: this is often called a “t-test” in software output. Technically, the t-distribution arises when data are Normal <em>and</em> the variance is estimated from the data. Our data are Bernoulli (not Normal), so there is no exact t-distribution result here. The CLT gives us approximate Normality, making this formally a <strong>z-test</strong>. For large samples the t and z distributions are nearly identical — the distinction has little practical impact, but it matters conceptually.</p>
+<div id="47d77eaa" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>z_stat  <span class="op">=</span> theta_hat <span class="op">/</span> se_analytic</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>p_value <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> stats.norm.sf(<span class="bu">abs</span>(z_stat))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"θ̂        = </span><span class="sc">{</span>theta_hat<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"SE       = </span><span class="sc">{</span>se_analytic<span class="sc">:.5f}</span><span class="ss">"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"z-stat   = </span><span class="sc">{</span>z_stat<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"p-value  = </span><span class="sc">{</span>p_value<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>θ̂        = 0.0250
+SE       = 0.01825
+z-stat   = 1.370
+p-value  = 0.1708</code></pre>
 </div>
 </div>
+<div id="d760ff7f" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div id="uxhuhddart" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#uxhuhddart table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#uxhuhddart thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#uxhuhddart p { margin: 0; padding: 0; }
+ #uxhuhddart .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #uxhuhddart .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #uxhuhddart .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #uxhuhddart .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #uxhuhddart .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #uxhuhddart .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #uxhuhddart .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #uxhuhddart .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #uxhuhddart .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #uxhuhddart .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #uxhuhddart .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #uxhuhddart .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #uxhuhddart .gt_spanner_row { border-bottom-style: hidden; }
+ #uxhuhddart .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #uxhuhddart .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #uxhuhddart .gt_from_md> :first-child { margin-top: 0; }
+ #uxhuhddart .gt_from_md> :last-child { margin-bottom: 0; }
+ #uxhuhddart .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #uxhuhddart .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #uxhuhddart .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #uxhuhddart .gt_row_group_first td { border-top-width: 2px; }
+ #uxhuhddart .gt_row_group_first th { border-top-width: 2px; }
+ #uxhuhddart .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #uxhuhddart .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #uxhuhddart .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #uxhuhddart .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #uxhuhddart .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #uxhuhddart .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #uxhuhddart .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #uxhuhddart .gt_left { text-align: left; }
+ #uxhuhddart .gt_center { text-align: center; }
+ #uxhuhddart .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #uxhuhddart .gt_font_normal { font-weight: normal; }
+ #uxhuhddart .gt_font_bold { font-weight: bold; }
+ #uxhuhddart .gt_font_italic { font-style: italic; }
+ #uxhuhddart .gt_super { font-size: 65%; }
+ #uxhuhddart .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #uxhuhddart .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="2" class="gt_heading gt_title gt_font_normal">Hypothesis Test Results</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">H₀: θ = 0 vs. H₁: θ ≠ 0</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Quantity" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Quantity</th>
+<th id="Value" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_center">Point estimate (θ̂)</td>
+<td class="gt_row gt_center">0.025</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center">Standard error</td>
+<td class="gt_row gt_center">0.01825</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center">z-statistic</td>
+<td class="gt_row gt_center">1.37</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center">p-value</td>
+<td class="gt_row gt_center">0.1708</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<p>With a p-value of np.float64(0.1708), we reject the null hypothesis at the <span class="math inline">\(\alpha = 0.05\)</span> level. If the two CTAs truly performed identically, the probability of observing a difference as large as ours in a sample of 1,000 is only 17.08%. The data provide reasonably strong evidence that CTA A outperforms CTA B.</p>
 </section>
 <section id="the-t-test-as-a-regression" class="level2">
 <h2 class="anchored" data-anchor-id="the-t-test-as-a-regression">The T-Test as a Regression</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<p>There is a neat algebraic equivalence that is easy to miss: the two-sample test we just ran is mathematically identical to a simple linear regression. The regression framework is far more flexible — it handles multiple treatment arms, control variables, and interactions with the same machinery.</p>
+<p>The setup: stack all 2,000 observations into one dataset. Define <span class="math inline">\(Y_i\)</span> as the sign-up outcome (0 or 1) and <span class="math inline">\(D_i\)</span> as a group indicator (<span class="math inline">\(D_i = 1\)</span> for CTA A, <span class="math inline">\(D_i = 0\)</span> for CTA B). Then fit:</p>
+<p><span class="math display">\[Y_i = \beta_0 + \beta_1 D_i + \varepsilon_i\]</span></p>
+<p>The coefficients have clean interpretations:</p>
 <ul>
-<li><p>It turns out that the two-sample test we just ran is mathematically equivalent to a simple linear regression. Understanding this connection is useful because it means the same machinery — and the same software — that you use for regression can also perform hypothesis tests, and it generalizes naturally to more complex experimental designs.</p></li>
-<li><p>Explain the setup to the reader. Stack the CTA A and CTA B data into a single dataset with two columns: an outcome <span class="math inline">\(Y_i\)</span> (1 if the visitor signed up, 0 otherwise) and an indicator <span class="math inline">\(D_i\)</span> (1 if the visitor saw CTA A, 0 if they saw CTA B). Then fit the regression:</p></li>
+<li><span class="math inline">\(\beta_0 = \pi_B\)</span> — the sign-up rate for the control group (CTA B).</li>
+<li><span class="math inline">\(\beta_1 = \pi_A - \pi_B = \theta\)</span> — exactly the quantity we’ve been estimating all along.</li>
 </ul>
-<p><span class="math display">\[
-Y_i = \beta_0 + \beta_1 D_i + \varepsilon_i
-\]</span></p>
-<ul>
-<li><p>Walk through the interpretation of the coefficients:</p>
-<ol type="1">
-<li><span class="math inline">\(\beta_0\)</span> is the expected value of <span class="math inline">\(Y_i\)</span> when <span class="math inline">\(D_i = 0\)</span> — i.e., the mean of the B group, which estimates <span class="math inline">\(\pi_B\)</span>.</li>
-<li><span class="math inline">\(\beta_0 + \beta_1\)</span> is the expected value of <span class="math inline">\(Y_i\)</span> when <span class="math inline">\(D_i = 1\)</span> — i.e., the mean of the A group, which estimates <span class="math inline">\(\pi_A\)</span>.</li>
-<li>Therefore <span class="math inline">\(\beta_1 = \pi_A - \pi_B = \theta\)</span>, and the OLS estimate <span class="math inline">\(\hat\beta_1\)</span> is numerically identical to <span class="math inline">\(\hat\theta = \bar{X}_A - \bar{X}_B\)</span>.</li>
-</ol></li>
-<li><p>Fit this regression using your simulated data. Report the coefficient estimate <span class="math inline">\(\hat\beta_1\)</span>, its standard error, its t-statistic, and its p-value. Compare these to the values you computed in the previous section using the two-sample approach — they should match (up to a small difference in how the standard error is computed; standard OLS assumes a single pooled variance, while the two-sample formula we used assumes separate variances for each group).</p></li>
-<li><p>Explain to the reader why this equivalence matters: the regression framework makes it easy to add controls, interactions, or additional treatment arms, all while producing the same inference in the simple case.</p></li>
-</ul>
+<div id="1d84e9ae" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> t <span class="im">as</span> t_dist</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> np.concatenate([group_A, group_B])</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> np.concatenate([np.ones(n), np.zeros(n)])</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack([np.ones(<span class="dv">2</span> <span class="op">*</span> n), D])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="op">=</span> np.linalg.lstsq(X, Y, rcond<span class="op">=</span><span class="va">None</span>)[<span class="dv">0</span>]</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>beta0, beta1 <span class="op">=</span> beta_hat</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>residuals <span class="op">=</span> Y <span class="op">-</span> X <span class="op">@</span> beta_hat</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="op">=</span> (residuals <span class="op">**</span> <span class="dv">2</span>).<span class="bu">sum</span>() <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> n <span class="op">-</span> <span class="dv">2</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>cov_beta <span class="op">=</span> sigma2 <span class="op">*</span> np.linalg.inv(X.T <span class="op">@</span> X)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>se_beta1 <span class="op">=</span> np.sqrt(cov_beta[<span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>t_stat <span class="op">=</span> beta1 <span class="op">/</span> se_beta1</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>p_reg  <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> t_dist.sf(<span class="bu">abs</span>(t_stat), df<span class="op">=</span><span class="dv">2</span> <span class="op">*</span> n <span class="op">-</span> <span class="dv">2</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"β̂₁ = </span><span class="sc">{</span>beta1<span class="sc">:.4f}</span><span class="ss">  SE = </span><span class="sc">{</span>se_beta1<span class="sc">:.5f}</span><span class="ss">  t = </span><span class="sc">{</span>t_stat<span class="sc">:.3f}</span><span class="ss">  p = </span><span class="sc">{</span>p_reg<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>β̂₁ = 0.0250  SE = 0.01826  t = 1.369  p = 0.1712</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/var/folders/bc/vwsxj9hd4hl_4btmd_yr1twc0000gn/T/ipykernel_10205/4040682451.py:10: RuntimeWarning: divide by zero encountered in matmul
+  residuals = Y - X @ beta_hat
+/var/folders/bc/vwsxj9hd4hl_4btmd_yr1twc0000gn/T/ipykernel_10205/4040682451.py:10: RuntimeWarning: overflow encountered in matmul
+  residuals = Y - X @ beta_hat
+/var/folders/bc/vwsxj9hd4hl_4btmd_yr1twc0000gn/T/ipykernel_10205/4040682451.py:10: RuntimeWarning: invalid value encountered in matmul
+  residuals = Y - X @ beta_hat</code></pre>
 </div>
 </div>
+<div id="78f64d3e" class="cell" data-execution_count="11">
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div id="vbpzzsubqr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#vbpzzsubqr table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#vbpzzsubqr thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#vbpzzsubqr p { margin: 0; padding: 0; }
+ #vbpzzsubqr .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #vbpzzsubqr .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #vbpzzsubqr .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #vbpzzsubqr .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #vbpzzsubqr .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vbpzzsubqr .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vbpzzsubqr .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vbpzzsubqr .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #vbpzzsubqr .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #vbpzzsubqr .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #vbpzzsubqr .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #vbpzzsubqr .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #vbpzzsubqr .gt_spanner_row { border-bottom-style: hidden; }
+ #vbpzzsubqr .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #vbpzzsubqr .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #vbpzzsubqr .gt_from_md> :first-child { margin-top: 0; }
+ #vbpzzsubqr .gt_from_md> :last-child { margin-bottom: 0; }
+ #vbpzzsubqr .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #vbpzzsubqr .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #vbpzzsubqr .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #vbpzzsubqr .gt_row_group_first td { border-top-width: 2px; }
+ #vbpzzsubqr .gt_row_group_first th { border-top-width: 2px; }
+ #vbpzzsubqr .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #vbpzzsubqr .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vbpzzsubqr .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #vbpzzsubqr .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #vbpzzsubqr .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #vbpzzsubqr .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vbpzzsubqr .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #vbpzzsubqr .gt_left { text-align: left; }
+ #vbpzzsubqr .gt_center { text-align: center; }
+ #vbpzzsubqr .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #vbpzzsubqr .gt_font_normal { font-weight: normal; }
+ #vbpzzsubqr .gt_font_bold { font-weight: bold; }
+ #vbpzzsubqr .gt_font_italic { font-style: italic; }
+ #vbpzzsubqr .gt_super { font-size: 65%; }
+ #vbpzzsubqr .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #vbpzzsubqr .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal">OLS Regression: Y ~ D</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Coefficient on the treatment indicator D</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Term" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Term</th>
+<th id="Estimate" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Estimate</th>
+<th id="Std.-Error" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Std. Error</th>
+<th id="t-statistic" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">t-statistic</th>
+<th id="p-value" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">p-value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_center">D (CTA A indicator)</td>
+<td class="gt_row gt_center">0.025</td>
+<td class="gt_row gt_center">0.01826</td>
+<td class="gt_row gt_center">1.369</td>
+<td class="gt_row gt_center">0.1712</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<p>The coefficient estimate <span class="math inline">\(\hat\beta_1 =\)</span> np.float64(0.025) is numerically identical to <span class="math inline">\(\hat\theta\)</span> from the two-sample test. The t-statistic and p-value also match closely. The small difference in standard errors arises because OLS pools variance across groups, while the two-sample formula estimates separate variances — a distinction that matters little when group sizes are equal and large.</p>
+<p>The practical payoff: whenever your experiment gets more complicated — multiple treatment arms, pre-experiment covariates, subgroup interactions — you don’t need a new test. You extend the regression.</p>
 </section>
 <section id="the-problem-with-peeking" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem-with-peeking">The Problem with Peeking</h2>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<p>So far we’ve assumed that we collect all 1,000 observations per group and <em>then</em> run a single test. In practice, that’s rarely what happens. Stakeholders are impatient. Dashboards get refreshed constantly. The temptation to check results early — and stop the moment something looks significant — is overwhelming.</p>
+<p>This practice is called <strong>peeking</strong>, and it’s statistically dangerous.</p>
+<p>Here’s why. A single test at <span class="math inline">\(\alpha = 0.05\)</span> has a 5% false positive rate: if <span class="math inline">\(H_0\)</span> is true, we’ll incorrectly reject it 5% of the time. But every time we peek and run a test, we get another chance at a false positive. Across 10 peeks, the cumulative probability of at least one false rejection is far higher than 5%.</p>
+<p>To quantify this, we simulate a world where the null hypothesis is <em>true</em> — both CTAs have a 20% sign-up rate (<span class="math inline">\(\theta = 0\)</span>) — and ask: how often does peeking lead us to a wrong conclusion?</p>
+<div id="65259c6b" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rng2 <span class="op">=</span> np.random.default_rng(<span class="dv">123</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>pi_null     <span class="op">=</span> <span class="fl">0.20</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>n_max       <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>peek_points <span class="op">=</span> np.arange(<span class="dv">100</span>, n_max <span class="op">+</span> <span class="dv">1</span>, <span class="dv">100</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>n_sims      <span class="op">=</span> <span class="dv">10_000</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_experiment(rng):</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> rng.binomial(<span class="dv">1</span>, pi_null, n_max)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> rng.binomial(<span class="dv">1</span>, pi_null, n_max)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> peek_points:</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        d    <span class="op">=</span> A[:k].mean() <span class="op">-</span> B[:k].mean()</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        pa   <span class="op">=</span> A[:k].mean()<span class="op">;</span> pb <span class="op">=</span> B[:k].mean()</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        se   <span class="op">=</span> np.sqrt(pa<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>pa)<span class="op">/</span>k <span class="op">+</span> pb<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>pb)<span class="op">/</span>k)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> se <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> stats.norm.sf(<span class="bu">abs</span>(d <span class="op">/</span> se))</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> p <span class="op">&lt;</span> <span class="fl">0.05</span>:</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>false_pos_rate <span class="op">=</span> np.mean([run_experiment(rng2) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_sims)])</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"False positive rate with peeking: </span><span class="sc">{</span>false_pos_rate<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>False positive rate with peeking: 19.7%</code></pre>
 </div>
-<div class="callout-title-container flex-fill">
-Note
+</div>
+<div id="5eba53b5" class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div id="nfvuxgbihg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#nfvuxgbihg table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#nfvuxgbihg thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#nfvuxgbihg p { margin: 0; padding: 0; }
+ #nfvuxgbihg .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #nfvuxgbihg .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #nfvuxgbihg .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #nfvuxgbihg .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #nfvuxgbihg .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #nfvuxgbihg .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #nfvuxgbihg .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #nfvuxgbihg .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #nfvuxgbihg .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #nfvuxgbihg .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #nfvuxgbihg .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #nfvuxgbihg .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #nfvuxgbihg .gt_spanner_row { border-bottom-style: hidden; }
+ #nfvuxgbihg .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #nfvuxgbihg .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #nfvuxgbihg .gt_from_md> :first-child { margin-top: 0; }
+ #nfvuxgbihg .gt_from_md> :last-child { margin-bottom: 0; }
+ #nfvuxgbihg .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #nfvuxgbihg .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #nfvuxgbihg .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #nfvuxgbihg .gt_row_group_first td { border-top-width: 2px; }
+ #nfvuxgbihg .gt_row_group_first th { border-top-width: 2px; }
+ #nfvuxgbihg .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #nfvuxgbihg .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #nfvuxgbihg .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #nfvuxgbihg .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #nfvuxgbihg .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #nfvuxgbihg .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #nfvuxgbihg .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #nfvuxgbihg .gt_left { text-align: left; }
+ #nfvuxgbihg .gt_center { text-align: center; }
+ #nfvuxgbihg .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #nfvuxgbihg .gt_font_normal { font-weight: normal; }
+ #nfvuxgbihg .gt_font_bold { font-weight: bold; }
+ #nfvuxgbihg .gt_font_italic { font-style: italic; }
+ #nfvuxgbihg .gt_super { font-size: 65%; }
+ #nfvuxgbihg .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #nfvuxgbihg .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="2" class="gt_heading gt_title gt_font_normal">Peeking Inflates the False Positive Rate</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Simulated under H₀: θ = 0 (10,000 experiments)</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Scenario" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Scenario</th>
+<th id="False-Positive-Rate" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">False Positive Rate</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_center">Single test at end (α = 0.05)</td>
+<td class="gt_row gt_center">5.0%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center">Peek after every 100 obs (10 peeks)</td>
+<td class="gt_row gt_center">19.7%</td>
+</tr>
+</tbody>
+</table>
+
+
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><p>Your boss is impatient. Rather than waiting until all 1,000 visitors have been assigned to each group, she wants to run the hypothesis test after every 100 visitors per group — peeking at the results after 100, 200, 300, …, up to 1,000 visitors per group (10 tests in total). If any of those tests comes back significant at the <span class="math inline">\(\alpha = 0.05\)</span> level, she wants to declare a winner and stop the experiment early.</p></li>
-<li><p>Explain to the reader why this is problematic under classical frequentist statistics. The key issue is that a single test at <span class="math inline">\(\alpha = 0.05\)</span> has a 5% chance of a false positive (rejecting <span class="math inline">\(H_0\)</span> when it is actually true). But when you conduct multiple tests on accumulating data, each peek is another opportunity to get a false positive. The overall probability of at least one false rejection across all the peeks is much higher than 5%.</p></li>
-<li><p>Demonstrate this with a simulation. The idea is as follows:</p>
-<ol type="1">
-<li>Set up a world where the null hypothesis is true: <span class="math inline">\(\pi_A = \pi_B = 0.20\)</span> (i.e., <span class="math inline">\(\theta = 0\)</span>, there is no difference between the CTAs).</li>
-<li>Simulate a single experiment: draw 1,000 observations for group A and 1,000 for group B. After every 100 observations per group (at <span class="math inline">\(n = 100, 200, \ldots, 1000\)</span>), compute the z-statistic and p-value. Record whether any of the 10 p-values falls below 0.05.</li>
-<li>Repeat step 2 a total of 10,000 times to simulate 10,000 experiments.</li>
-<li>Compute the fraction of those 10,000 experiments in which at least one peek produced a significant result. This is the empirical false positive rate under peeking.</li>
-</ol></li>
-<li><p>Compare this to the nominal 5% false positive rate of a single test. Report the result and explain to the reader why peeking inflates the Type I error rate and what this means in practice for running A/B tests.</p></li>
-</ul>
 </div>
-</div>
+<p>The results are stark. With a single end-of-experiment test, the false positive rate is the intended 5%. With 10 peeks at <span class="math inline">\(\alpha = 0.05\)</span> each time, the false positive rate balloons to roughly <strong>19.7%</strong> — more than <strong>np.float64(3.9)× higher</strong> than advertised.</p>
+<p>In practical terms: if your team stops the experiment the moment a dashboard turns green, you’ll declare a winner roughly one in 5 times even when there is genuinely <em>no</em> difference. Decisions made this way are decisions based on noise.</p>
+<p>The fix is not to never look at data — it’s to either (a) pre-commit to a single end-of-experiment analysis, (b) apply a multiple-testing correction such as Bonferroni, or (c) adopt a sequential testing framework like the mSPRT, which is designed to allow continuous monitoring without inflating error rates. Classical frequentist statistics was built around fixed-sample designs; the peeking problem is a reminder to respect that assumption.</p>
+<hr>
+<p><em>References: Larsen et al.&nbsp;(2023), “Statistical Challenges in Online Controlled Experiments,” <a href="https://arxiv.org/abs/2212.11366">arXiv:2212.11366</a>; Johari et al.&nbsp;(2017), “Peeking at A/B Tests: Why It Matters and What to Do About It,” KDD 2017.</em></p>
 
 
 </section>
