@@ -15,12 +15,13 @@ Welcome to my website
 ## Skills
 - Cadence
 - Matlab
+- GIS
 - Python
 - SQL
 - Data Visualization
 
 ## Interests
-- Circuit Design
+- Analog /。Digital Circuit Design
 - Machine learning
 - Marketing analytics
 - Product strategy
