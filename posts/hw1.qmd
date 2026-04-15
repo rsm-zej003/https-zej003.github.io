@@ -76,7 +76,6 @@ group_A = rng.binomial(1, pi_A, n)
 group_B = rng.binomial(1, pi_B, n)
 
 theta_hat = group_A.mean() - group_B.mean()
-print(f"Observed θ̂ = {theta_hat:.4f}  (true θ = 0.04)")
 ```
 
 Our observed estimate is close to the true value of 0.04. But how much should we trust a single estimate from 1,000 observations? Let's find out.
@@ -142,10 +141,6 @@ se_analytic = np.sqrt(
 
 ci_lower = theta_hat - 1.96 * se_boot
 ci_upper = theta_hat + 1.96 * se_boot
-
-print(f"Bootstrap SE : {se_boot:.5f}")
-print(f"Analytical SE: {se_analytic:.5f}")
-print(f"95% CI: [{ci_lower:.4f}, {ci_upper:.4f}]")
 ```
 
 ```{python}
@@ -252,13 +247,10 @@ The logic runs as follows:
 A note on terminology: this is often called a "t-test" in software output. Technically, the t-distribution arises when data are Normal *and* the variance is estimated from the data. Our data are Bernoulli (not Normal), so there is no exact t-distribution result here. The CLT gives us approximate Normality, making this formally a **z-test**. For large samples the t and z distributions are nearly identical — the distinction has little practical impact, but it matters conceptually.
 
 ```{python}
+#| results: hide
+
 z_stat  = theta_hat / se_analytic
 p_value = 2 * stats.norm.sf(abs(z_stat))
-
-print(f"θ̂        = {theta_hat:.4f}")
-print(f"SE       = {se_analytic:.5f}")
-print(f"z-stat   = {z_stat:.3f}")
-print(f"p-value  = {p_value:.4f}")
 ```
 
 ```{python}
@@ -314,7 +306,6 @@ se_beta1 = np.sqrt(cov_beta[1, 1])
 t_stat = beta1 / se_beta1
 p_reg  = 2 * t_dist.sf(abs(t_stat), df=2 * n - 2)
 
-print(f"β̂₁ = {beta1:.4f}  SE = {se_beta1:.5f}  t = {t_stat:.3f}  p = {p_reg:.4f}")
 ```
 
 ```{python}
@@ -373,7 +364,6 @@ def run_experiment(rng):
     return False
 
 false_pos_rate = np.mean([run_experiment(rng2) for _ in range(n_sims)])
-print(f"False positive rate with peeking: {false_pos_rate:.1%}")
 ```
 
 ```{python}
