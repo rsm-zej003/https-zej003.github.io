@@ -1,5 +1,4 @@
-
-.about a {
+.about .about-contents a {
   display: inline-block;
   margin: 6px 8px 6px 0;
   padding: 8px 14px;
@@ -10,7 +9,7 @@
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.about a:hover {
+.about .about-contents a:hover {
   background-color: #163a5f;
   transform: translateY(-2px);
 }
