@@ -7,25 +7,11 @@
     "text": "About this site"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "About",
-    "section": "",
-    "text": "Welcome to my website\n\n\n\nCadence\nMatlab\nPython\nSQL\nData Visualization\n\n\n\n\n\nCircuit Design\nMachine learning\nMarketing analytics\nProduct strategy\n\n\n\n\n📧 Email\n💼 LinkedIn\n💻 GitHub"
-  },
-  {
     "objectID": "projects.html",
     "href": "projects.html",
     "title": "Projects",
     "section": "",
     "text": "Customer Analysis\n\n\nAnalyze customer behavior using Python\n\n\n\n\n\n\n\n\n\n\n\n\nSales Prediction\n\n\nPredict sales using machine learning\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "resume.html",
-    "href": "resume.html",
-    "title": "Resume",
-    "section": "",
-    "text": "Download PDF file."
   },
   {
     "objectID": "projects/project1/index.html",
@@ -56,6 +42,13 @@
     "text": "Results\nSome insights here…"
   },
   {
+    "objectID": "resume.html",
+    "href": "resume.html",
+    "title": "Resume",
+    "section": "",
+    "text": "Download PDF file."
+  },
+  {
     "objectID": "projects/project2/index.html",
     "href": "projects/project2/index.html",
     "title": "Sales Prediction",
@@ -82,6 +75,13 @@
     "title": "Sales Prediction",
     "section": "Results",
     "text": "Results\nModel performance…"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "About",
+    "section": "",
+    "text": "Welcome to my website\n\n\n\nCadence\nMatlab\nPython\nSQL\nData Visualization\n\n\n\n\n\nCircuit Design\nMachine learning\nMarketing analytics\nProduct strategy\n\n\n\n\n📧 Email\n💼 LinkedIn\n💻 GitHub"
   },
   {
     "objectID": "index.html#skills",
