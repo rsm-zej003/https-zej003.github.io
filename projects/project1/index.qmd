@@ -1,0 +1,16 @@
+---
+title: "Customer Analysis"
+image: "../../files/4951.png"
+description: "Analyze customer behavior using Python"
+---
+
+## Overview
+This project analyzes customer data...
+
+## Methods
+- Data cleaning
+- Visualization
+- Modeling
+
+## Results
+Some insights here...

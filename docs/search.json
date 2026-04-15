@@ -1,0 +1,107 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "About",
+    "section": "",
+    "text": "Welcome to my website\n\n\n\nCadence\nMatlab\nPython\nSQL\nData Visualization\n\n\n\n\n\nCircuit Design\nMachine learning\nMarketing analytics\nProduct strategy\n\n\n\n\n📧 Email\n💼 LinkedIn\n💻 GitHub"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "Customer Analysis\n\n\nAnalyze customer behavior using Python\n\n\n\n\n\n\n\n\n\n\n\n\nSales Prediction\n\n\nPredict sales using machine learning\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "resume.html",
+    "href": "resume.html",
+    "title": "Resume",
+    "section": "",
+    "text": "Download PDF file."
+  },
+  {
+    "objectID": "projects/project1/index.html",
+    "href": "projects/project1/index.html",
+    "title": "Customer Analysis",
+    "section": "",
+    "text": "This project analyzes customer data…"
+  },
+  {
+    "objectID": "projects/project1/index.html#overview",
+    "href": "projects/project1/index.html#overview",
+    "title": "Customer Analysis",
+    "section": "",
+    "text": "This project analyzes customer data…"
+  },
+  {
+    "objectID": "projects/project1/index.html#methods",
+    "href": "projects/project1/index.html#methods",
+    "title": "Customer Analysis",
+    "section": "Methods",
+    "text": "Methods\n\nData cleaning\nVisualization\nModeling"
+  },
+  {
+    "objectID": "projects/project1/index.html#results",
+    "href": "projects/project1/index.html#results",
+    "title": "Customer Analysis",
+    "section": "Results",
+    "text": "Results\nSome insights here…"
+  },
+  {
+    "objectID": "projects/project2/index.html",
+    "href": "projects/project2/index.html",
+    "title": "Sales Prediction",
+    "section": "",
+    "text": "This project builds a prediction model…"
+  },
+  {
+    "objectID": "projects/project2/index.html#overview",
+    "href": "projects/project2/index.html#overview",
+    "title": "Sales Prediction",
+    "section": "",
+    "text": "This project builds a prediction model…"
+  },
+  {
+    "objectID": "projects/project2/index.html#methods",
+    "href": "projects/project2/index.html#methods",
+    "title": "Sales Prediction",
+    "section": "Methods",
+    "text": "Methods\n\nRegression\nFeature engineering"
+  },
+  {
+    "objectID": "projects/project2/index.html#results",
+    "href": "projects/project2/index.html#results",
+    "title": "Sales Prediction",
+    "section": "Results",
+    "text": "Results\nModel performance…"
+  },
+  {
+    "objectID": "index.html#skills",
+    "href": "index.html#skills",
+    "title": "About",
+    "section": "",
+    "text": "Cadence\nMatlab\nPython\nSQL\nData Visualization"
+  },
+  {
+    "objectID": "index.html#interests",
+    "href": "index.html#interests",
+    "title": "About",
+    "section": "",
+    "text": "Circuit Design\nMachine learning\nMarketing analytics\nProduct strategy"
+  },
+  {
+    "objectID": "index.html#links",
+    "href": "index.html#links",
+    "title": "About",
+    "section": "",
+    "text": "📧 Email\n💼 LinkedIn\n💻 GitHub"
+  }
+]

@@ -1,0 +1,15 @@
+---
+title: "Sales Prediction"
+image: "../../files/4952.jpeg"
+description: "Predict sales using machine learning"
+---
+
+## Overview
+This project builds a prediction model...
+
+## Methods
+- Regression
+- Feature engineering
+
+## Results
+Model performance...

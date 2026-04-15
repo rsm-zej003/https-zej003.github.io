@@ -1,0 +1,35 @@
+---
+title: "About"
+---
+
+::: {.grid}
+::: {.g-col-6}
+![](files/linbei.jpg){width=75%}
+:::
+
+::: {.g-col-6}
+# Zejun Jiang
+
+Welcome to my website
+
+## Skills
+- Cadence
+- Matlab
+- Python
+- SQL
+- Data Visualization
+
+## Interests
+- Circuit Design
+- Machine learning
+- Marketing analytics
+- Product strategy
+
+
+## Links
+
+[📧 Email](mailto:zej003@ucsd.edu)
+
+[💼 LinkedIn](https://linkedin.com/in/yourname)
+
+[💻 GitHub](https://github.com/yourname)
