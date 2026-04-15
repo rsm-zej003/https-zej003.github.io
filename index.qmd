@@ -21,7 +21,7 @@ Welcome to my website
 - Data Visualization
 
 ## Interests
-- Analog /。Digital Circuit Design
+- Analog Circuit Design
 - Machine learning
 - Marketing analytics
 - Product strategy
