@@ -181,7 +181,7 @@ se_diff_b  = diff_se(nj['FTE'].dropna(), pa['FTE'].dropna())
 se_diff_a  = diff_se(nj['FTE2'].dropna(), pa['FTE2'].dropna())
 
 def fmt(val, se):
-    return f"{val:.2f}\n({se:.2f})"
+    return f"{val:.2f} ({se:.2f})"
 
 tbl3 = pd.DataFrame({
     'Variable':      ['FTE before', 'FTE after', 'Change (after − before)'],
