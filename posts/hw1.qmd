@@ -28,6 +28,8 @@ In an A/B test, visitors are randomly assigned to see one of the two versions. H
 
 This post walks through the full statistical machinery behind that inference: how we model the data, how we estimate the effect, and how we decide whether the evidence is strong enough to declare a winner. Along the way, we'll simulate data and use it to demonstrate three foundational results from classical statistics — the Law of Large Numbers, the Bootstrap, and the Central Limit Theorem — before connecting them to a formal hypothesis test and a regression model. We'll also explore one of the most common mistakes practitioners make: peeking at results too early.
 
+The example is intentionally small and stylized, so the focus stays on the statistical workflow rather than on website-specific details.
+
 
 ## The A/B Test as a Statistical Problem
 
@@ -38,6 +40,8 @@ The quantity we care about is the **difference in sign-up rates**:
 $$\theta = \pi_A - \pi_B$$
 
 If $\theta > 0$, CTA A performs better; if $\theta < 0$, CTA B is superior; if $\theta = 0$, the two are equivalent. Our job is to estimate $\theta$ and assess how confident we can be in that estimate.
+
+This sign convention is useful because every later result can be read in the same direction: positive values favor CTA A, negative values favor CTA B, and values near zero suggest little practical difference.
 
 The natural estimator is the **difference in sample proportions**:
 
@@ -57,6 +61,8 @@ We'll assume:
 - True effect: $\theta = \pi_A - \pi_B = 0.04$
 
 We simulate 1,000 visitors per group — 2,000 total.
+
+The effect size is deliberately modest: a four-percentage-point lift is large enough to detect with this sample size, but small enough that sampling noise still matters.
 
 ```{python}
 import numpy as np
@@ -331,6 +337,8 @@ The coefficient estimate $\hat\beta_1 =$ `{python} round(beta1, 4)` is numerical
 
 The practical payoff: whenever your experiment gets more complicated — multiple treatment arms, pre-experiment covariates, subgroup interactions — you don't need a new test. You extend the regression.
 
+This is why regression often becomes the common language for experiment analysis: it preserves the simple difference-in-means interpretation while making room for richer designs.
+
 
 ## The Problem with Peeking
 
@@ -388,6 +396,8 @@ The results are stark. With a single end-of-experiment test, the false positive 
 In practical terms: if your team stops the experiment the moment a dashboard turns green, you'll declare a winner roughly one in `{python} round(1/false_pos_rate)` times even when there is genuinely *no* difference. Decisions made this way are decisions based on noise.
 
 The fix is not to never look at data — it's to either (a) pre-commit to a single end-of-experiment analysis, (b) apply a multiple-testing correction such as Bonferroni, or (c) adopt a sequential testing framework like the mSPRT, which is designed to allow continuous monitoring without inflating error rates. Classical frequentist statistics was built around fixed-sample designs; the peeking problem is a reminder to respect that assumption.
+
+The broader lesson is that good experimental design is not just about choosing the right estimator; it also means deciding in advance how evidence will be monitored and acted on.
 
 ---
 
