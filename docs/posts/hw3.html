@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.13">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Zejun Jiang">
+<meta name="dcterms.date" content="2026-05-17">
+
+<title>Poisson Regression and Maximum Likelihood Estimation – Zejun Jiang</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ac077c1e730dfeb5e42400639d17284e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-64c7893f24d6af40daa6c77a78335647.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Zejun Jiang</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../resume.html"> 
+<span class="menu-text">Resume</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#exploring-the-data" id="toc-exploring-the-data" class="nav-link" data-scroll-target="#exploring-the-data">Exploring the Data</a>
+  <ul class="collapse">
+  <li><a href="#patent-counts-by-customer-status" id="toc-patent-counts-by-customer-status" class="nav-link" data-scroll-target="#patent-counts-by-customer-status">Patent Counts by Customer Status</a></li>
+  <li><a href="#regional-composition" id="toc-regional-composition" class="nav-link" data-scroll-target="#regional-composition">Regional Composition</a></li>
+  <li><a href="#firm-age" id="toc-firm-age" class="nav-link" data-scroll-target="#firm-age">Firm Age</a></li>
+  </ul></li>
+  <li><a href="#a-simple-poisson-model-via-maximum-likelihood" id="toc-a-simple-poisson-model-via-maximum-likelihood" class="nav-link" data-scroll-target="#a-simple-poisson-model-via-maximum-likelihood">A Simple Poisson Model via Maximum Likelihood</a>
+  <ul class="collapse">
+  <li><a href="#why-poisson" id="toc-why-poisson" class="nav-link" data-scroll-target="#why-poisson">Why Poisson?</a></li>
+  <li><a href="#deriving-the-log-likelihood" id="toc-deriving-the-log-likelihood" class="nav-link" data-scroll-target="#deriving-the-log-likelihood">Deriving the Log-likelihood</a></li>
+  <li><a href="#coding-the-log-likelihood" id="toc-coding-the-log-likelihood" class="nav-link" data-scroll-target="#coding-the-log-likelihood">Coding the Log-likelihood</a></li>
+  <li><a href="#visualizing-the-log-likelihood-curve" id="toc-visualizing-the-log-likelihood-curve" class="nav-link" data-scroll-target="#visualizing-the-log-likelihood-curve">Visualizing the Log-likelihood Curve</a></li>
+  <li><a href="#the-mle-is-the-sample-mean" id="toc-the-mle-is-the-sample-mean" class="nav-link" data-scroll-target="#the-mle-is-the-sample-mean">The MLE is the Sample Mean</a></li>
+  <li><a href="#confirming-numerically" id="toc-confirming-numerically" class="nav-link" data-scroll-target="#confirming-numerically">Confirming Numerically</a></li>
+  </ul></li>
+  <li><a href="#poisson-regression" id="toc-poisson-regression" class="nav-link" data-scroll-target="#poisson-regression">Poisson Regression</a>
+  <ul class="collapse">
+  <li><a href="#from-one-rate-to-many" id="toc-from-one-rate-to-many" class="nav-link" data-scroll-target="#from-one-rate-to-many">From One Rate to Many</a></li>
+  <li><a href="#regression-log-likelihood" id="toc-regression-log-likelihood" class="nav-link" data-scroll-target="#regression-log-likelihood">Regression Log-likelihood</a></li>
+  <li><a href="#building-the-design-matrix" id="toc-building-the-design-matrix" class="nav-link" data-scroll-target="#building-the-design-matrix">Building the Design Matrix</a></li>
+  <li><a href="#finding-the-mle-numerically" id="toc-finding-the-mle-numerically" class="nav-link" data-scroll-target="#finding-the-mle-numerically">Finding the MLE Numerically</a></li>
+  <li><a href="#standard-errors-from-the-hessian" id="toc-standard-errors-from-the-hessian" class="nav-link" data-scroll-target="#standard-errors-from-the-hessian">Standard Errors from the Hessian</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#verification-with-statsmodels" id="toc-verification-with-statsmodels" class="nav-link" data-scroll-target="#verification-with-statsmodels">Verification with <code>statsmodels</code></a></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  </ul></li>
+  <li><a href="#the-effect-of-blueprintys-software" id="toc-the-effect-of-blueprintys-software" class="nav-link" data-scroll-target="#the-effect-of-blueprintys-software">The Effect of Blueprinty’s Software</a>
+  <ul class="collapse">
+  <li><a href="#counterfactual-prediction" id="toc-counterfactual-prediction" class="nav-link" data-scroll-target="#counterfactual-prediction">Counterfactual Prediction</a></li>
+  <li><a href="#visualizing-the-counterfactual-distribution" id="toc-visualizing-the-counterfactual-distribution" class="nav-link" data-scroll-target="#visualizing-the-counterfactual-distribution">Visualizing the Counterfactual Distribution</a></li>
+  <li><a href="#summary-table" id="toc-summary-table" class="nav-link" data-scroll-target="#summary-table">Summary Table</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Poisson Regression and Maximum Likelihood Estimation</h1>
+<p class="subtitle lead">Does Blueprinty’s Software Help Engineers Win More Patents?</p>
+  <div class="quarto-categories">
+    <div class="quarto-category">statistics</div>
+    <div class="quarto-category">MLE</div>
+    <div class="quarto-category">Poisson regression</div>
+    <div class="quarto-category">marketing analytics</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Zejun Jiang </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 17, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Blueprinty makes software specifically designed for preparing patent applications. Their marketing team wants to claim that engineering firms using the software are more successful at getting patents approved — and they have data to back it up: 1,500 mature engineering firms, each with a count of patents awarded over the last five years, a regional label, a firm age, and a flag for whether the firm is a Blueprinty customer.</p>
+<p>The raw numbers look promising. Blueprinty customers average <strong>4.13 patents</strong> over the period; non-customers average only <strong>3.47</strong>. That’s a 19% gap. Case closed?</p>
+<p>Not quite. Blueprinty’s customers are not a random sample of engineering firms. Firms that choose to buy patent-management software may differ systematically from those that don’t — in their size, their industry focus, their location, or how long they’ve been around. If customers are, on average, older or concentrated in regions with historically stronger patent activity, the raw gap in patent counts could reflect those underlying differences rather than any benefit from the software itself.</p>
+<p>To make a credible argument, we need to isolate the software’s effect after accounting for the characteristics of the firms. We’ll do that with a <strong>Poisson regression</strong> estimated by <strong>maximum likelihood</strong> — a model purpose-built for count outcomes like patent awards.</p>
+</section>
+<section id="exploring-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-the-data">Exploring the Data</h2>
+<section id="patent-counts-by-customer-status" class="level3">
+<h3 class="anchored" data-anchor-id="patent-counts-by-customer-status">Patent Counts by Customer Status</h3>
+<p>The dataset contains np.int64(1019) non-customers and np.int64(481) customers. Their patent distributions overlap substantially, but the customer distribution is shifted to the right:</p>
+<div id="56f81cbb" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-4-output-1.png" width="1149" height="503" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Customers average <strong>4.13</strong> patents versus <strong>3.47</strong> for non-customers — a 19% raw difference. Both distributions are right-skewed and clearly non-negative integers, which immediately motivates a count model rather than ordinary linear regression.</p>
+</section>
+<section id="regional-composition" class="level3">
+<h3 class="anchored" data-anchor-id="regional-composition">Regional Composition</h3>
+<p>The gap in patent counts could reflect geography rather than software. Let’s see how customers and non-customers break down across regions:</p>
+<div id="3192a0d3" class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-5-output-1.png" width="897" height="453" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The Northeast stands out sharply: <strong>55%</strong> of Northeast firms are Blueprinty customers, compared with roughly 16–18% in every other region. This matters because if Northeast firms are also more patent-productive for independent reasons — denser engineering talent, proximity to universities, industry mix — then the raw customer-vs.-non-customer gap partly reflects a geography effect. Any honest analysis must control for region.</p>
+</section>
+<section id="firm-age" class="level3">
+<h3 class="anchored" data-anchor-id="firm-age">Firm Age</h3>
+<div id="187fd6cf" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-7-output-1.png" width="1156" height="477" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Age distributions are nearly identical: non-customers average <strong>26.1</strong> years, customers <strong>26.9</strong> years. This is reassuring — the two groups are not systematically different in seniority — but we will still control for age in the regression because we expect patent productivity to vary non-linearly with firm maturity.</p>
+</section>
+</section>
+<section id="a-simple-poisson-model-via-maximum-likelihood" class="level2">
+<h2 class="anchored" data-anchor-id="a-simple-poisson-model-via-maximum-likelihood">A Simple Poisson Model via Maximum Likelihood</h2>
+<section id="why-poisson" class="level3">
+<h3 class="anchored" data-anchor-id="why-poisson">Why Poisson?</h3>
+<p>Patent counts can’t be negative, must be integers, and for most firms hover in a small range with a long right tail. These are textbook features of count data, and the <strong>Poisson distribution</strong> is the canonical model for count outcomes. A Poisson random variable <span class="math inline">\(Y\)</span> with rate parameter <span class="math inline">\(\lambda &gt; 0\)</span> has probability mass function</p>
+<p><span class="math display">\[
+f(Y \mid \lambda) = \frac{e^{-\lambda}\,\lambda^{Y}}{Y!}, \qquad Y = 0, 1, 2, \ldots
+\]</span></p>
+<p>Its mean and variance are both equal to <span class="math inline">\(\lambda\)</span> — a single parameter captures both the level and the spread, which is what makes maximum likelihood estimation so clean.</p>
+</section>
+<section id="deriving-the-log-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="deriving-the-log-likelihood">Deriving the Log-likelihood</h3>
+<p>Given <span class="math inline">\(n\)</span> independent firms with patent counts <span class="math inline">\(Y_1, \ldots, Y_n\)</span>, all assumed drawn from the same <span class="math inline">\(\text{Poisson}(\lambda)\)</span>, the joint likelihood is</p>
+<p><span class="math display">\[
+L(\lambda) = \prod_{i=1}^{n} \frac{e^{-\lambda}\,\lambda^{Y_i}}{Y_i!}
+\]</span></p>
+<p>Taking logs converts the product into a sum — much easier to work with:</p>
+<p><span class="math display">\[
+\ell(\lambda)
+  = \sum_{i=1}^{n} \left[-\lambda + Y_i \ln \lambda - \ln(Y_i!)\right]
+  = -n\lambda + \left(\sum_{i=1}^{n} Y_i\right)\ln\lambda - \sum_{i=1}^{n}\ln(Y_i!)
+\]</span></p>
+<p>The last term does not depend on <span class="math inline">\(\lambda\)</span>, so it is irrelevant for finding the MLE. We can drop it when optimizing.</p>
+</section>
+<section id="coding-the-log-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="coding-the-log-likelihood">Coding the Log-likelihood</h3>
+<div id="f937b1b4" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln   <span class="co"># gammaln(k+1) = log(k!)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_loglikelihood(lam, Y):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Log-likelihood of Poisson(lam) for observed counts Y."""</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">sum</span>(<span class="op">-</span>lam <span class="op">+</span> Y <span class="op">*</span> np.log(lam) <span class="op">-</span> gammaln(Y <span class="op">+</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="visualizing-the-log-likelihood-curve" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-the-log-likelihood-curve">Visualizing the Log-likelihood Curve</h3>
+<div id="35c4e90f" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> df[<span class="st">"patents"</span>].values</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>lam_grid <span class="op">=</span> np.linspace(<span class="fl">1.0</span>, <span class="fl">8.0</span>, <span class="dv">400</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ll_vals   <span class="op">=</span> [poisson_loglikelihood(lam, Y) <span class="cf">for</span> lam <span class="kw">in</span> lam_grid]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="a1ad8565" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-10-output-1.png" width="896" height="479" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The curve is concave and has a single peak — the MLE. You can read the MLE directly off the horizontal axis as the value of <span class="math inline">\(\lambda\)</span> where the curve reaches its maximum, marked by the dashed vertical line.</p>
+</section>
+<section id="the-mle-is-the-sample-mean" class="level3">
+<h3 class="anchored" data-anchor-id="the-mle-is-the-sample-mean">The MLE is the Sample Mean</h3>
+<p>Differentiating <span class="math inline">\(\ell(\lambda)\)</span> with respect to <span class="math inline">\(\lambda\)</span> and setting the result to zero:</p>
+<p><span class="math display">\[
+\frac{d\ell}{d\lambda} = -n + \frac{\sum_{i=1}^{n} Y_i}{\lambda} = 0
+\quad\Longrightarrow\quad
+\hat{\lambda}_{\text{MLE}} = \frac{1}{n}\sum_{i=1}^{n} Y_i = \bar{Y}
+\]</span></p>
+<p>This is intuitive: the MLE of the Poisson rate is simply the sample average, because <span class="math inline">\(\lambda\)</span> is the population mean and the sample mean is its natural estimator.</p>
+</section>
+<section id="confirming-numerically" class="level3">
+<h3 class="anchored" data-anchor-id="confirming-numerically">Confirming Numerically</h3>
+<div id="7429ad76" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>result_simple <span class="op">=</span> optimize.minimize_scalar(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> lam: <span class="op">-</span>poisson_loglikelihood(lam, Y),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    bounds<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">15.0</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">"bounded"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>lambda_mle  <span class="op">=</span> result_simple.x</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>lambda_ybar <span class="op">=</span> Y.mean()</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Numerical MLE:  </span><span class="sc">{</span>lambda_mle<span class="sc">:.6f}</span><span class="ss">"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Sample mean:    </span><span class="sc">{</span>lambda_ybar<span class="sc">:.6f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Numerical MLE:  3.684666
+Sample mean:    3.684667</code></pre>
+</div>
+</div>
+<p>The two values agree to six decimal places, confirming that the optimizer found the correct solution.</p>
+</section>
+</section>
+<section id="poisson-regression" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-regression">Poisson Regression</h2>
+<section id="from-one-rate-to-many" class="level3">
+<h3 class="anchored" data-anchor-id="from-one-rate-to-many">From One Rate to Many</h3>
+<p>Assuming every firm shares the same <span class="math inline">\(\lambda\)</span> ignores all the variation we just saw in the data — region, age, and customer status all correlate with patent counts. The natural extension is <strong>Poisson regression</strong>, where each firm <span class="math inline">\(i\)</span> gets its own rate:</p>
+<p><span class="math display">\[
+Y_i \sim \text{Poisson}(\lambda_i), \qquad
+\lambda_i = \exp(X_i^{\prime}\beta)
+\]</span></p>
+<p>The <strong>exponential link</strong> is essential: <span class="math inline">\(X_i^{\prime}\beta\)</span> can be any real number, but <span class="math inline">\(\lambda_i\)</span> must be positive. Taking the exponent guarantees positivity without any constraints on the coefficients.</p>
+</section>
+<section id="regression-log-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="regression-log-likelihood">Regression Log-likelihood</h3>
+<p>The log-likelihood generalizes straightforwardly — replace the scalar <span class="math inline">\(\lambda\)</span> with firm-specific <span class="math inline">\(\lambda_i = \exp(X_i^{\prime}\beta)\)</span>:</p>
+<div id="7ea7f0a4" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_regression_loglikelihood(beta, Y, X):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Poisson regression log-likelihood."""</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    lam <span class="op">=</span> np.exp(np.clip(X <span class="op">@</span> beta, <span class="op">-</span><span class="dv">500</span>, <span class="dv">500</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">sum</span>(<span class="op">-</span>lam <span class="op">+</span> Y <span class="op">*</span> np.log(np.maximum(lam, <span class="fl">1e-300</span>)) <span class="op">-</span> gammaln(Y <span class="op">+</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="building-the-design-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="building-the-design-matrix">Building the Design Matrix</h3>
+<p>We include: an intercept, firm age, <strong>age squared</strong> (patent productivity likely peaks at some intermediate age and then levels off — a linear term can’t capture that), four region indicators (dropping Midwest as the reference category to avoid perfect collinearity with the intercept), and the customer indicator.</p>
+<div id="c2a84b3b" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack([</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    np.ones(<span class="bu">len</span>(df)),                                       <span class="co"># intercept</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"age"</span>].values,                                       <span class="co"># age</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"age"</span>].values <span class="op">**</span> <span class="dv">2</span>,                                  <span class="co"># age²</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    (df[<span class="st">"region"</span>] <span class="op">==</span> <span class="st">"Northeast"</span>).astype(<span class="bu">float</span>).values,     <span class="co"># NE vs. Midwest</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    (df[<span class="st">"region"</span>] <span class="op">==</span> <span class="st">"Northwest"</span>).astype(<span class="bu">float</span>).values,     <span class="co"># NW vs. Midwest</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    (df[<span class="st">"region"</span>] <span class="op">==</span> <span class="st">"South"</span>).astype(<span class="bu">float</span>).values,         <span class="co"># South vs. Midwest</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    (df[<span class="st">"region"</span>] <span class="op">==</span> <span class="st">"Southwest"</span>).astype(<span class="bu">float</span>).values,     <span class="co"># SW vs. Midwest</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"iscustomer"</span>].values.astype(<span class="bu">float</span>),                  <span class="co"># Blueprinty customer?</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>col_names <span class="op">=</span> [</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Intercept"</span>, <span class="st">"Age"</span>, <span class="st">"Age²"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Northeast"</span>, <span class="st">"Northwest"</span>, <span class="st">"South"</span>, <span class="st">"Southwest"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Customer"</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="finding-the-mle-numerically" class="level3">
+<h3 class="anchored" data-anchor-id="finding-the-mle-numerically">Finding the MLE Numerically</h3>
+<p>We minimize the <strong>negative</strong> log-likelihood (equivalent to maximizing the log-likelihood). We supply the analytical gradient and Hessian so the optimizer can use exact curvature information rather than finite differences:</p>
+<div id="5ae768e0" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_ll(beta):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>poisson_regression_loglikelihood(beta, Y, X)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_grad(beta):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    lam <span class="op">=</span> np.exp(np.clip(X <span class="op">@</span> beta, <span class="op">-</span><span class="dv">500</span>, <span class="dv">500</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X.T <span class="op">@</span> (lam <span class="op">-</span> Y)                                  <span class="co"># gradient of -ℓ</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_hess(beta):</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    lam <span class="op">=</span> np.exp(np.clip(X <span class="op">@</span> beta, <span class="op">-</span><span class="dv">500</span>, <span class="dv">500</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X.T <span class="op">@</span> (lam[:, <span class="va">None</span>] <span class="op">*</span> X)                        <span class="co"># Hessian of -ℓ</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> np.zeros(X.shape[<span class="dv">1</span>])</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>x0[<span class="dv">0</span>] <span class="op">=</span> np.log(Y.mean())                                   <span class="co"># warm-start intercept</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> optimize.minimize(</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    neg_ll,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    x0<span class="op">=</span>x0,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    jac<span class="op">=</span>neg_grad,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">"BFGS"</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="op">=</span> result.x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="standard-errors-from-the-hessian" class="level3">
+<h3 class="anchored" data-anchor-id="standard-errors-from-the-hessian">Standard Errors from the Hessian</h3>
+<p>At the MLE, the curvature of the log-likelihood tells us how precisely <span class="math inline">\(\beta\)</span> is estimated. Specifically, the covariance matrix of <span class="math inline">\(\hat{\beta}\)</span> is the <strong>inverse of the negative Hessian</strong> of <span class="math inline">\(\ell\)</span> evaluated at <span class="math inline">\(\hat{\beta}\)</span>:</p>
+<p><span class="math display">\[
+\widehat{\operatorname{Var}}(\hat{\beta}) = \left[-\nabla^2 \ell(\hat{\beta})\right]^{-1}
+= \left[X^{\top}\operatorname{diag}(\hat{\lambda})\,X\right]^{-1}
+\]</span></p>
+<p>Standard errors are the square roots of the diagonal:</p>
+<div id="14b9093b" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>H   <span class="op">=</span> neg_hess(beta_hat)          <span class="co"># -∇²ℓ at the MLE (positive definite)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>cov <span class="op">=</span> np.linalg.inv(H)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>se  <span class="op">=</span> np.sqrt(np.diag(cov))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="results" class="level3">
+<h3 class="anchored" data-anchor-id="results">Results</h3>
+<div id="ffc88d1a" class="cell" data-execution_count="15">
+<div class="cell-output cell-output-display">
+<div id="aqiyppbcbs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#aqiyppbcbs table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#aqiyppbcbs thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#aqiyppbcbs p { margin: 0; padding: 0; }
+ #aqiyppbcbs .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #aqiyppbcbs .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #aqiyppbcbs .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #aqiyppbcbs .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #aqiyppbcbs .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #aqiyppbcbs .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #aqiyppbcbs .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #aqiyppbcbs .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #aqiyppbcbs .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #aqiyppbcbs .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #aqiyppbcbs .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #aqiyppbcbs .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #aqiyppbcbs .gt_spanner_row { border-bottom-style: hidden; }
+ #aqiyppbcbs .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #aqiyppbcbs .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #aqiyppbcbs .gt_from_md> :first-child { margin-top: 0; }
+ #aqiyppbcbs .gt_from_md> :last-child { margin-bottom: 0; }
+ #aqiyppbcbs .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #aqiyppbcbs .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #aqiyppbcbs .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #aqiyppbcbs .gt_row_group_first td { border-top-width: 2px; }
+ #aqiyppbcbs .gt_row_group_first th { border-top-width: 2px; }
+ #aqiyppbcbs .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #aqiyppbcbs .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #aqiyppbcbs .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #aqiyppbcbs .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #aqiyppbcbs .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #aqiyppbcbs .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #aqiyppbcbs .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #aqiyppbcbs .gt_left { text-align: left; }
+ #aqiyppbcbs .gt_center { text-align: center; }
+ #aqiyppbcbs .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #aqiyppbcbs .gt_font_normal { font-weight: normal; }
+ #aqiyppbcbs .gt_font_bold { font-weight: bold; }
+ #aqiyppbcbs .gt_font_italic { font-style: italic; }
+ #aqiyppbcbs .gt_super { font-size: 65%; }
+ #aqiyppbcbs .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #aqiyppbcbs .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal">Poisson Regression Coefficients</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">MLE via BFGS · Hessian-based standard errors · Reference region: Midwest</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Variable" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Variable</th>
+<th id="Estimate" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Estimate</th>
+<th id="Std.-Error" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Std. Error</th>
+<th id="z" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">z</th>
+<th id="p-value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">p-value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left">Intercept</td>
+<td class="gt_row gt_right">-0.5089</td>
+<td class="gt_row gt_right">0.1832</td>
+<td class="gt_row gt_right">-2.78</td>
+<td class="gt_row gt_right">0.005</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Age</td>
+<td class="gt_row gt_right">0.1486</td>
+<td class="gt_row gt_right">0.0139</td>
+<td class="gt_row gt_right">10.72</td>
+<td class="gt_row gt_right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Age²</td>
+<td class="gt_row gt_right">-0.0030</td>
+<td class="gt_row gt_right">0.0003</td>
+<td class="gt_row gt_right">-11.51</td>
+<td class="gt_row gt_right">&lt; 0.001</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Northeast</td>
+<td class="gt_row gt_right">0.0292</td>
+<td class="gt_row gt_right">0.0436</td>
+<td class="gt_row gt_right">0.67</td>
+<td class="gt_row gt_right">0.504</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Northwest</td>
+<td class="gt_row gt_right">-0.0176</td>
+<td class="gt_row gt_right">0.0538</td>
+<td class="gt_row gt_right">-0.33</td>
+<td class="gt_row gt_right">0.744</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">South</td>
+<td class="gt_row gt_right">0.0566</td>
+<td class="gt_row gt_right">0.0527</td>
+<td class="gt_row gt_right">1.07</td>
+<td class="gt_row gt_right">0.283</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Southwest</td>
+<td class="gt_row gt_right">0.0506</td>
+<td class="gt_row gt_right">0.0472</td>
+<td class="gt_row gt_right">1.07</td>
+<td class="gt_row gt_right">0.284</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #FEF3E2">Customer</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.2076</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.0309</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">6.72</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">&lt; 0.001</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="verification-with-statsmodels" class="level3">
+<h3 class="anchored" data-anchor-id="verification-with-statsmodels">Verification with <code>statsmodels</code></h3>
+<div id="4fc47bdf" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>glm_fit <span class="op">=</span> sm.GLM(Y, X, family<span class="op">=</span>sm.families.Poisson()).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="b4535fa9" class="cell" data-execution_count="17">
+<div class="cell-output cell-output-display">
+<div id="azblntlmss" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#azblntlmss table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#azblntlmss thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#azblntlmss p { margin: 0; padding: 0; }
+ #azblntlmss .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #azblntlmss .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #azblntlmss .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #azblntlmss .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #azblntlmss .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #azblntlmss .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #azblntlmss .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #azblntlmss .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #azblntlmss .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #azblntlmss .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #azblntlmss .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #azblntlmss .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #azblntlmss .gt_spanner_row { border-bottom-style: hidden; }
+ #azblntlmss .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #azblntlmss .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #azblntlmss .gt_from_md> :first-child { margin-top: 0; }
+ #azblntlmss .gt_from_md> :last-child { margin-bottom: 0; }
+ #azblntlmss .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #azblntlmss .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #azblntlmss .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #azblntlmss .gt_row_group_first td { border-top-width: 2px; }
+ #azblntlmss .gt_row_group_first th { border-top-width: 2px; }
+ #azblntlmss .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #azblntlmss .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #azblntlmss .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #azblntlmss .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #azblntlmss .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #azblntlmss .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #azblntlmss .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #azblntlmss .gt_left { text-align: left; }
+ #azblntlmss .gt_center { text-align: center; }
+ #azblntlmss .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #azblntlmss .gt_font_normal { font-weight: normal; }
+ #azblntlmss .gt_font_bold { font-weight: bold; }
+ #azblntlmss .gt_font_italic { font-style: italic; }
+ #azblntlmss .gt_super { font-size: 65%; }
+ #azblntlmss .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #azblntlmss .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal">Poisson GLM Coefficients (statsmodels)</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Cross-check — IRLS algorithm · Fisher information standard errors · Reference region: Midwest</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Variable" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Variable</th>
+<th id="Estimate" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Estimate</th>
+<th id="Std.-Error" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Std. Error</th>
+<th id="z" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">z</th>
+<th id="p-value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">p-value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left">Intercept</td>
+<td class="gt_row gt_right">-0.5089</td>
+<td class="gt_row gt_right">0.1832</td>
+<td class="gt_row gt_right">-2.78</td>
+<td class="gt_row gt_right">0.005</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Age</td>
+<td class="gt_row gt_right">0.1486</td>
+<td class="gt_row gt_right">0.0139</td>
+<td class="gt_row gt_right">10.72</td>
+<td class="gt_row gt_right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Age²</td>
+<td class="gt_row gt_right">-0.0030</td>
+<td class="gt_row gt_right">0.0003</td>
+<td class="gt_row gt_right">-11.51</td>
+<td class="gt_row gt_right">&lt; 0.001</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">Northeast</td>
+<td class="gt_row gt_right">0.0292</td>
+<td class="gt_row gt_right">0.0436</td>
+<td class="gt_row gt_right">0.67</td>
+<td class="gt_row gt_right">0.504</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Northwest</td>
+<td class="gt_row gt_right">-0.0176</td>
+<td class="gt_row gt_right">0.0538</td>
+<td class="gt_row gt_right">-0.33</td>
+<td class="gt_row gt_right">0.744</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">South</td>
+<td class="gt_row gt_right">0.0566</td>
+<td class="gt_row gt_right">0.0527</td>
+<td class="gt_row gt_right">1.07</td>
+<td class="gt_row gt_right">0.283</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Southwest</td>
+<td class="gt_row gt_right">0.0506</td>
+<td class="gt_row gt_right">0.0472</td>
+<td class="gt_row gt_right">1.07</td>
+<td class="gt_row gt_right">0.284</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #FEF3E2">Customer</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.2076</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.0309</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">6.72</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">&lt; 0.001</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<p>The coefficient estimates from our hand-coded MLE match the <code>sm.GLM</code> output to four decimal places. The standard errors are also nearly identical — both are derived from the same Fisher information formula <span class="math inline">\([X^{\top}\operatorname{diag}(\hat{\lambda})X]^{-1}\)</span>; minor differences can arise from the internal numerical procedures each method uses.</p>
+</section>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">Interpretation</h3>
+<p><strong>Age and Age²:</strong> The positive age coefficient (≈ 0.149) and negative age-squared coefficient (≈ −0.003) together imply an <strong>inverted-U</strong> relationship between firm age and patent productivity. Differentiating the linear predictor, patent output peaks at approximately age <span class="math inline">\(\approx 0.149 / (2 \times 0.003) \approx 25\)</span> years. Firms younger than that are still building capacity; firms older than that see diminishing innovation rates.</p>
+<p><strong>Region:</strong> After controlling for age and customer status, no region differs significantly from the Midwest reference. The Northeast’s raw advantage in patent counts turns out to be largely explained by its higher concentration of Blueprinty customers.</p>
+<p><strong>Customer:</strong> This is the key coefficient. An estimate of <strong>0.208</strong> (SE = 0.031, <span class="math inline">\(p &lt; 0.001\)</span>) means that — holding age and region constant — being a Blueprinty customer multiplies a firm’s expected patent rate by <span class="math inline">\(e^{0.208} \approx 1.23\)</span>. That is a <strong>23% increase</strong> in the Poisson rate.</p>
+</section>
+</section>
+<section id="the-effect-of-blueprintys-software" class="level2">
+<h2 class="anchored" data-anchor-id="the-effect-of-blueprintys-software">The Effect of Blueprinty’s Software</h2>
+<section id="counterfactual-prediction" class="level3">
+<h3 class="anchored" data-anchor-id="counterfactual-prediction">Counterfactual Prediction</h3>
+<p>Because the Poisson model is multiplicative in <span class="math inline">\(\lambda_i\)</span>, we cannot read the customer effect off the coefficient directly as “X extra patents.” Instead, we construct two counterfactual datasets from the actual sample:</p>
+<ul>
+<li><span class="math inline">\(X_0\)</span>: every firm’s customer status set to <strong>0</strong> (no software)</li>
+<li><span class="math inline">\(X_1\)</span>: every firm’s customer status set to <strong>1</strong> (uses software)</li>
+</ul>
+<p>We then predict expected patent counts under each scenario and take the average difference:</p>
+<div id="9407b0f9" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>X0 <span class="op">=</span> X.copy()<span class="op">;</span>  X0[:, <span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>X1 <span class="op">=</span> X.copy()<span class="op">;</span>  X1[:, <span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>yhat0 <span class="op">=</span> np.exp(X0 <span class="op">@</span> beta_hat)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>yhat1 <span class="op">=</span> np.exp(X1 <span class="op">@</span> beta_hat)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>ate <span class="op">=</span> (yhat1 <span class="op">-</span> yhat0).mean()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Average treatment effect: </span><span class="sc">{</span>ate<span class="sc">:.4f}</span><span class="ss"> additional patents"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Average treatment effect: 0.7928 additional patents</code></pre>
+</div>
+</div>
+</section>
+<section id="visualizing-the-counterfactual-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-the-counterfactual-distribution">Visualizing the Counterfactual Distribution</h3>
+<div id="c39e43f3" class="cell" data-execution_count="19">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-20-output-1.png" width="898" height="481" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="summary-table" class="level3">
+<h3 class="anchored" data-anchor-id="summary-table">Summary Table</h3>
+<div id="0e8df7de" class="cell" data-execution_count="20">
+<div class="cell-output cell-output-display">
+<div id="oktkarpwxx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#oktkarpwxx table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#oktkarpwxx thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#oktkarpwxx p { margin: 0; padding: 0; }
+ #oktkarpwxx .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #oktkarpwxx .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #oktkarpwxx .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #oktkarpwxx .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #oktkarpwxx .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #oktkarpwxx .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #oktkarpwxx .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #oktkarpwxx .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #oktkarpwxx .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #oktkarpwxx .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #oktkarpwxx .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #oktkarpwxx .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #oktkarpwxx .gt_spanner_row { border-bottom-style: hidden; }
+ #oktkarpwxx .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #oktkarpwxx .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #oktkarpwxx .gt_from_md> :first-child { margin-top: 0; }
+ #oktkarpwxx .gt_from_md> :last-child { margin-bottom: 0; }
+ #oktkarpwxx .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #oktkarpwxx .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #oktkarpwxx .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #oktkarpwxx .gt_row_group_first td { border-top-width: 2px; }
+ #oktkarpwxx .gt_row_group_first th { border-top-width: 2px; }
+ #oktkarpwxx .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #oktkarpwxx .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #oktkarpwxx .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #oktkarpwxx .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #oktkarpwxx .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #oktkarpwxx .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #oktkarpwxx .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #oktkarpwxx .gt_left { text-align: left; }
+ #oktkarpwxx .gt_center { text-align: center; }
+ #oktkarpwxx .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #oktkarpwxx .gt_font_normal { font-weight: normal; }
+ #oktkarpwxx .gt_font_bold { font-weight: bold; }
+ #oktkarpwxx .gt_font_italic { font-style: italic; }
+ #oktkarpwxx .gt_super { font-size: 65%; }
+ #oktkarpwxx .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #oktkarpwxx .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="2" class="gt_heading gt_title gt_font_normal">Counterfactual Patent Predictions</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Holding age and region fixed at observed values for each firm</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Scenario" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Scenario</th>
+<th id="Mean-predicted-patents" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Mean predicted patents</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left">Without software (X₀)</td>
+<td class="gt_row gt_right">3.436</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">With software (X₁)</td>
+<td class="gt_row gt_right">4.229</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="background-color: #FEF3E2">Difference (X₁ − X₀)</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.793</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>After controlling for firm age and regional location, a firm using Blueprinty’s software is predicted to receive roughly <strong>0.79</strong> more patents over a five-year window than it would without it — a 23% lift relative to the counterfactual no-software baseline.</p>
+<p>This is a meaningful effect, and it is consistent with Blueprinty’s marketing claim. However, a word of caution is warranted. This is an <strong>observational study</strong>, not a randomized experiment. We have controlled for age and region, but we cannot rule out <em>unobserved</em> firm characteristics — management quality, R&amp;D intensity, patent attorney relationships — that might both predict software adoption and independently drive more patents. The regression tells us that the customer effect survives controls for age and geography, which is supportive evidence. It does not tell us that the effect is causal.</p>
+<p>A natural next step would be an instrumental-variable analysis or a difference-in-differences design using firms that adopted the software in different years — approaches that can speak more directly to causality. For now, the evidence is suggestive and statistically strong, but the honest conclusion is: <em>consistent with</em> Blueprinty’s claim, not <em>proof</em> of it.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
