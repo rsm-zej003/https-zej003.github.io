@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.13">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Zejun Jiang">
+<meta name="dcterms.date" content="2026-05-27">
+
+<title>MaxDiff Analysis of MSBA Class Preferences – Zejun Jiang</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ac077c1e730dfeb5e42400639d17284e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-64c7893f24d6af40daa6c77a78335647.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Zejun Jiang</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../resume.html"> 
+<span class="menu-text">Resume</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">The Data</a>
+  <ul class="collapse">
+  <li><a href="#loading-and-structure" id="toc-loading-and-structure" class="nav-link" data-scroll-target="#loading-and-structure">Loading and Structure</a></li>
+  <li><a href="#sanity-check" id="toc-sanity-check" class="nav-link" data-scroll-target="#sanity-check">Sanity Check</a></li>
+  <li><a href="#exposure-balance" id="toc-exposure-balance" class="nav-link" data-scroll-target="#exposure-balance">Exposure Balance</a></li>
+  </ul></li>
+  <li><a href="#counts-analysis" id="toc-counts-analysis" class="nav-link" data-scroll-target="#counts-analysis">Counts Analysis</a>
+  <ul class="collapse">
+  <li><a href="#bootstrap-confidence-intervals" id="toc-bootstrap-confidence-intervals" class="nav-link" data-scroll-target="#bootstrap-confidence-intervals">Bootstrap Confidence Intervals</a></li>
+  <li><a href="#results-table" id="toc-results-table" class="nav-link" data-scroll-target="#results-table">Results Table</a></li>
+  <li><a href="#score-chart-with-95-bootstrap-cis" id="toc-score-chart-with-95-bootstrap-cis" class="nav-link" data-scroll-target="#score-chart-with-95-bootstrap-cis">Score Chart with 95% Bootstrap CIs</a></li>
+  </ul></li>
+  <li><a href="#from-maxdiff-data-to-mnl-choices" id="toc-from-maxdiff-data-to-mnl-choices" class="nav-link" data-scroll-target="#from-maxdiff-data-to-mnl-choices">From MaxDiff Data to MNL Choices</a>
+  <ul class="collapse">
+  <li><a href="#the-choice-model" id="toc-the-choice-model" class="nav-link" data-scroll-target="#the-choice-model">The Choice Model</a></li>
+  <li><a href="#identifiability" id="toc-identifiability" class="nav-link" data-scroll-target="#identifiability">Identifiability</a></li>
+  <li><a href="#reshaping-the-data" id="toc-reshaping-the-data" class="nav-link" data-scroll-target="#reshaping-the-data">Reshaping the Data</a></li>
+  </ul></li>
+  <li><a href="#mnl-via-maximum-likelihood" id="toc-mnl-via-maximum-likelihood" class="nav-link" data-scroll-target="#mnl-via-maximum-likelihood">MNL via Maximum Likelihood</a>
+  <ul class="collapse">
+  <li><a href="#log-likelihood" id="toc-log-likelihood" class="nav-link" data-scroll-target="#log-likelihood">Log-Likelihood</a></li>
+  <li><a href="#maximising-the-likelihood" id="toc-maximising-the-likelihood" class="nav-link" data-scroll-target="#maximising-the-likelihood">Maximising the Likelihood</a></li>
+  <li><a href="#standard-errors-from-the-hessian" id="toc-standard-errors-from-the-hessian" class="nav-link" data-scroll-target="#standard-errors-from-the-hessian">Standard Errors from the Hessian</a></li>
+  <li><a href="#shares-of-preference" id="toc-shares-of-preference" class="nav-link" data-scroll-target="#shares-of-preference">Shares of Preference</a></li>
+  <li><a href="#results-table-1" id="toc-results-table-1" class="nav-link" data-scroll-target="#results-table-1">Results Table</a></li>
+  <li><a href="#mle-share-chart" id="toc-mle-share-chart" class="nav-link" data-scroll-target="#mle-share-chart">MLE Share Chart</a></li>
+  </ul></li>
+  <li><a href="#mnl-via-bayesian-estimation" id="toc-mnl-via-bayesian-estimation" class="nav-link" data-scroll-target="#mnl-via-bayesian-estimation">MNL via Bayesian Estimation</a>
+  <ul class="collapse">
+  <li><a href="#posterior-and-prior" id="toc-posterior-and-prior" class="nav-link" data-scroll-target="#posterior-and-prior">Posterior and Prior</a></li>
+  <li><a href="#metropolis-hastings-sampler" id="toc-metropolis-hastings-sampler" class="nav-link" data-scroll-target="#metropolis-hastings-sampler">Metropolis-Hastings Sampler</a></li>
+  <li><a href="#tuning-the-step-size" id="toc-tuning-the-step-size" class="nav-link" data-scroll-target="#tuning-the-step-size">Tuning the Step Size</a></li>
+  <li><a href="#burn-in-and-post-burn-in-draws" id="toc-burn-in-and-post-burn-in-draws" class="nav-link" data-scroll-target="#burn-in-and-post-burn-in-draws">Burn-In and Post-Burn-In Draws</a></li>
+  <li><a href="#trace-plots" id="toc-trace-plots" class="nav-link" data-scroll-target="#trace-plots">Trace Plots</a></li>
+  <li><a href="#posterior-summaries" id="toc-posterior-summaries" class="nav-link" data-scroll-target="#posterior-summaries">Posterior Summaries</a></li>
+  <li><a href="#bayesian-results-table" id="toc-bayesian-results-table" class="nav-link" data-scroll-target="#bayesian-results-table">Bayesian Results Table</a></li>
+  <li><a href="#bayesian-share-chart-with-credible-intervals" id="toc-bayesian-share-chart-with-credible-intervals" class="nav-link" data-scroll-target="#bayesian-share-chart-with-credible-intervals">Bayesian Share Chart with Credible Intervals</a></li>
+  </ul></li>
+  <li><a href="#comparing-the-three-methods" id="toc-comparing-the-three-methods" class="nav-link" data-scroll-target="#comparing-the-three-methods">Comparing the Three Methods</a>
+  <ul class="collapse">
+  <li><a href="#side-by-side-visual-comparison" id="toc-side-by-side-visual-comparison" class="nav-link" data-scroll-target="#side-by-side-visual-comparison">Side-by-Side Visual Comparison</a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a>
+  <ul class="collapse">
+  <li><a href="#substantive-findings" id="toc-substantive-findings" class="nav-link" data-scroll-target="#substantive-findings">Substantive Findings</a></li>
+  <li><a href="#methodological-takeaways" id="toc-methodological-takeaways" class="nav-link" data-scroll-target="#methodological-takeaways">Methodological Takeaways</a></li>
+  <li><a href="#caveats" id="toc-caveats" class="nav-link" data-scroll-target="#caveats">Caveats</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">MaxDiff Analysis of MSBA Class Preferences</h1>
+<p class="subtitle lead">Counts, MLE, and Bayesian Estimation of the Multinomial Logit Model</p>
+  <div class="quarto-categories">
+    <div class="quarto-category">statistics</div>
+    <div class="quarto-category">MNL</div>
+    <div class="quarto-category">MCMC</div>
+    <div class="quarto-category">MaxDiff</div>
+    <div class="quarto-category">marketing analytics</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Zejun Jiang </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 27, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>How do MSBA students actually rank their core courses? Asking people to rate each class on a 1–10 scale sounds easy, but there is a catch: respondents differ in how generously they use the scale. One student’s “7” is another’s “9.” The ratings end up measuring both preference <em>and</em> individual scale-use habits, which muddles any comparison.</p>
+<p><strong>MaxDiff</strong> (Maximum Difference Scaling, also called Best-Worst Scaling) sidesteps this problem. Instead of assigning a number to each item, respondents are shown a small subset of items and asked two simple questions: <em>Which do you prefer most? Which do you prefer least?</em> These forced trade-offs are harder to game — the respondent must make a real choice — and the resulting data carry much more information per question than a rating scale.</p>
+<p>In this study, 85 MSBA students each completed 8 standard MaxDiff tasks. Each task displayed 4 of the 10 core MSBA courses. Students picked the course they would most prefer and the one they would least prefer from the four shown.</p>
+<p>We analyze the data three ways and compare what each method tells us:</p>
+<ol type="1">
+<li><strong>Counts analysis</strong> — a quick, model-free score for each course</li>
+<li><strong>MNL via Maximum Likelihood</strong> — a formal model of choice that extracts more signal from the data</li>
+<li><strong>Bayesian MNL via Metropolis-Hastings MCMC</strong> — the same model with full posterior uncertainty</li>
+</ol>
+</section>
+<section id="the-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-data">The Data</h2>
+<section id="loading-and-structure" class="level3">
+<h3 class="anchored" data-anchor-id="loading-and-structure">Loading and Structure</h3>
+<div id="9075e693" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df_main <span class="op">=</span> pd.read_csv(<span class="st">"../hw/hw4/maxdiff_design_and_choices.csv"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_main.head(<span class="dv">8</span>).to_string(index<span class="op">=</span><span class="va">False</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Record ID  Task  Position  Item  Response
+69fb85fbd66b452e6decf4f7     1         1     5         0
+69fb85fbd66b452e6decf4f7     1         2     7         1
+69fb85fbd66b452e6decf4f7     1         3     4         0
+69fb85fbd66b452e6decf4f7     1         4     1        -1
+69fb85fbd66b452e6decf4f7     2         1     8        -1
+69fb85fbd66b452e6decf4f7     2         2     3         0
+69fb85fbd66b452e6decf4f7     2         3    10         1
+69fb85fbd66b452e6decf4f7     2         4     9         0</code></pre>
+</div>
+</div>
+<p>Each row is one item on one task screen for one respondent. The five columns are:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Record ID</code></td>
+<td>anonymised respondent hash</td>
+</tr>
+<tr class="even">
+<td><code>Task</code></td>
+<td>screen number within the respondent’s survey</td>
+</tr>
+<tr class="odd">
+<td><code>Position</code></td>
+<td>slot (1–4) on the screen</td>
+</tr>
+<tr class="even">
+<td><code>Item</code></td>
+<td>which of the 10 courses is in this slot</td>
+</tr>
+<tr class="odd">
+<td><code>Response</code></td>
+<td><code>1</code> = picked best, <code>−1</code> = picked worst, <code>0</code> = not picked</td>
+</tr>
+</tbody>
+</table>
+<div id="3e386f96" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>N_resp <span class="op">=</span> df_main[<span class="st">"Record ID"</span>].nunique()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>T_per  <span class="op">=</span> df_main.groupby(<span class="st">"Record ID"</span>)[<span class="st">"Task"</span>].nunique().iloc[<span class="dv">0</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>J_per  <span class="op">=</span> <span class="dv">4</span>   <span class="co"># items per standard task</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>N_items <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Respondents (N):          </span><span class="sc">{</span>N_resp<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Tasks per respondent (T): </span><span class="sc">{</span>T_per<span class="sc">}</span><span class="ss">  (Tasks 1–8 are 4-item MaxDiff; Tasks 9–15 are 2-item anchor tasks)"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Items per task (J):       </span><span class="sc">{</span>J_per<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Distinct classes:         </span><span class="sc">{</span>N_items<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Respondents (N):          85
+Tasks per respondent (T): 15  (Tasks 1–8 are 4-item MaxDiff; Tasks 9–15 are 2-item anchor tasks)
+Items per task (J):       4
+Distinct classes:         10</code></pre>
+</div>
+</div>
+<p>Tasks 1–8 are the standard MaxDiff screens (4 items each). Tasks 9–15 are <strong>anchor tasks</strong>: each course appears alongside a single “anchor” option (Item 11) to help calibrate the absolute utility scale. The main analysis below uses only the 680 standard 4-item tasks; the anchor items are noted but set aside.</p>
+</section>
+<section id="sanity-check" class="level3">
+<h3 class="anchored" data-anchor-id="sanity-check">Sanity Check</h3>
+<p>Every standard task must have exactly one “best” pick and exactly one “worst” pick.</p>
+<div id="2d309f63" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>task_check <span class="op">=</span> (</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    df4.groupby([<span class="st">"Record ID"</span>, <span class="st">"Task"</span>])[<span class="st">"Response"</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .agg(n_best<span class="op">=</span><span class="kw">lambda</span> x: (x <span class="op">==</span> <span class="dv">1</span>).<span class="bu">sum</span>(),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>         n_worst<span class="op">=</span><span class="kw">lambda</span> x: (x <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>())</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Tasks violating best == 1 :"</span>, (task_check[<span class="st">"n_best"</span>]  <span class="op">!=</span> <span class="dv">1</span>).<span class="bu">sum</span>())</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Tasks violating worst == 1:"</span>, (task_check[<span class="st">"n_worst"</span>] <span class="op">!=</span> <span class="dv">1</span>).<span class="bu">sum</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tasks violating best == 1 : 0
+Tasks violating worst == 1: 0</code></pre>
+</div>
+</div>
+</section>
+<section id="exposure-balance" class="level3">
+<h3 class="anchored" data-anchor-id="exposure-balance">Exposure Balance</h3>
+<p>A well-designed MaxDiff study shows every item roughly the same number of times. Let’s confirm.</p>
+<div id="29ed9c03" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div id="dfnbckvaez" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#dfnbckvaez table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#dfnbckvaez thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#dfnbckvaez p { margin: 0; padding: 0; }
+ #dfnbckvaez .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #dfnbckvaez .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #dfnbckvaez .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #dfnbckvaez .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #dfnbckvaez .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #dfnbckvaez .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #dfnbckvaez .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #dfnbckvaez .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #dfnbckvaez .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #dfnbckvaez .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #dfnbckvaez .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #dfnbckvaez .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #dfnbckvaez .gt_spanner_row { border-bottom-style: hidden; }
+ #dfnbckvaez .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #dfnbckvaez .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #dfnbckvaez .gt_from_md> :first-child { margin-top: 0; }
+ #dfnbckvaez .gt_from_md> :last-child { margin-bottom: 0; }
+ #dfnbckvaez .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #dfnbckvaez .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #dfnbckvaez .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #dfnbckvaez .gt_row_group_first td { border-top-width: 2px; }
+ #dfnbckvaez .gt_row_group_first th { border-top-width: 2px; }
+ #dfnbckvaez .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #dfnbckvaez .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #dfnbckvaez .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #dfnbckvaez .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #dfnbckvaez .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #dfnbckvaez .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #dfnbckvaez .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #dfnbckvaez .gt_left { text-align: left; }
+ #dfnbckvaez .gt_center { text-align: center; }
+ #dfnbckvaez .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #dfnbckvaez .gt_font_normal { font-weight: normal; }
+ #dfnbckvaez .gt_font_bold { font-weight: bold; }
+ #dfnbckvaez .gt_font_italic { font-style: italic; }
+ #dfnbckvaez .gt_super { font-size: 65%; }
+ #dfnbckvaez .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #dfnbckvaez .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="3" class="gt_heading gt_title gt_font_normal">Item Exposure in 4-Item MaxDiff Tasks</td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Item" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Item</th>
+<th id="Course" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Course</th>
+<th id="Times-shown" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Times shown</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left">MGTA 403 · AI Math &amp; Analytics</td>
+<td class="gt_row gt_right">273</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_left">MGTA 464 · SQL</td>
+<td class="gt_row gt_right">274</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left">MGTA 451 · Mktg / Fin / Ops</td>
+<td class="gt_row gt_right">272</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_left">MGTA 452 · Large Data</td>
+<td class="gt_row gt_right">276</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_left">MGTA 453 · Business Analytics</td>
+<td class="gt_row gt_right">270</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_left">MGTA 444 · Analytics Consulting</td>
+<td class="gt_row gt_right">267</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_left">MGTA 455 · Customer Analytics</td>
+<td class="gt_row gt_right">276</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_left">MGTA 454 · Capstone Project</td>
+<td class="gt_row gt_right">272</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_left">MGTA 495 · Marketing Analytics</td>
+<td class="gt_row gt_right">274</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right">10</td>
+<td class="gt_row gt_left">MGTA 457 · Biz. Intelligence</td>
+<td class="gt_row gt_right">266</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<p>Exposure is balanced across all 10 courses (266–276 appearances each), confirming the design is equitable.</p>
+</section>
+</section>
+<section id="counts-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="counts-analysis">Counts Analysis</h2>
+<p>The simplest summary of MaxDiff data is the <strong>counts score</strong>:</p>
+<p><span class="math display">\[
+\text{score}_j = \frac{\text{times best}_j}{\text{times shown}_j} - \frac{\text{times worst}_j}{\text{times shown}_j}
+\]</span></p>
+<p>A score near +1 means the course was almost always the favourite when shown; near −1 means it was almost always the least favourite; near 0 means it’s middle-of-the-pack.</p>
+<div id="e9942ab7" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> (</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    df4.groupby(<span class="st">"Item"</span>)[<span class="st">"Response"</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .agg(shown<span class="op">=</span><span class="st">"count"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>         best<span class="op">=</span><span class="kw">lambda</span> x: (x <span class="op">==</span> <span class="dv">1</span>).<span class="bu">sum</span>(),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>         worst<span class="op">=</span><span class="kw">lambda</span> x: (x <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>())</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    .assign(pct_best <span class="op">=</span><span class="kw">lambda</span> d: d[<span class="st">"best"</span>]  <span class="op">/</span> d[<span class="st">"shown"</span>],</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            pct_worst<span class="op">=</span><span class="kw">lambda</span> d: d[<span class="st">"worst"</span>] <span class="op">/</span> d[<span class="st">"shown"</span>],</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>            score    <span class="op">=</span><span class="kw">lambda</span> d: d[<span class="st">"pct_best"</span>] <span class="op">-</span> d[<span class="st">"pct_worst"</span>])</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    .sort_values(<span class="st">"score"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    .reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>counts[<span class="st">"Course"</span>] <span class="op">=</span> counts[<span class="st">"Item"</span>].<span class="bu">map</span>(SHORT_LABELS)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="bootstrap-confidence-intervals" class="level3">
+<h3 class="anchored" data-anchor-id="bootstrap-confidence-intervals">Bootstrap Confidence Intervals</h3>
+<p>We resample respondents with replacement 1,000 times to get 95% CIs on each score.</p>
+<div id="8885a88b" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>resp_ids <span class="op">=</span> df4[<span class="st">"Record ID"</span>].unique()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>n_resp   <span class="op">=</span> <span class="bu">len</span>(resp_ids)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>resp_idx <span class="op">=</span> {r: i <span class="cf">for</span> i, r <span class="kw">in</span> <span class="bu">enumerate</span>(resp_ids)}</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>df4[<span class="st">"_rid"</span>] <span class="op">=</span> df4[<span class="st">"Record ID"</span>].<span class="bu">map</span>(resp_idx)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>shown_mat <span class="op">=</span> np.zeros((n_resp, <span class="dv">10</span>))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>best_mat  <span class="op">=</span> np.zeros((n_resp, <span class="dv">10</span>))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>worst_mat <span class="op">=</span> np.zeros((n_resp, <span class="dv">10</span>))</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _, row <span class="kw">in</span> df4.iterrows():</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    r, it <span class="op">=</span> row[<span class="st">"_rid"</span>], <span class="bu">int</span>(row[<span class="st">"Item"</span>]) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    shown_mat[r, it] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> row[<span class="st">"Response"</span>] <span class="op">==</span>  <span class="dv">1</span>: best_mat[r, it]  <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> row[<span class="st">"Response"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>: worst_mat[r, it] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>rng_boot <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>n_boot   <span class="op">=</span> <span class="dv">1_000</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>boot_scores <span class="op">=</span> np.zeros((n_boot, <span class="dv">10</span>))</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> <span class="bu">range</span>(n_boot):</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    s_idx <span class="op">=</span> rng_boot.integers(<span class="dv">0</span>, n_resp, n_resp)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    sh <span class="op">=</span> shown_mat[s_idx].<span class="bu">sum</span>(<span class="dv">0</span>)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    be <span class="op">=</span> best_mat[s_idx].<span class="bu">sum</span>(<span class="dv">0</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    wo <span class="op">=</span> worst_mat[s_idx].<span class="bu">sum</span>(<span class="dv">0</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    boot_scores[b] <span class="op">=</span> be <span class="op">/</span> sh <span class="op">-</span> wo <span class="op">/</span> sh</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>ci_lo <span class="op">=</span> np.percentile(boot_scores, <span class="fl">2.5</span>,  axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>ci_hi <span class="op">=</span> np.percentile(boot_scores, <span class="fl">97.5</span>, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>counts[<span class="st">"ci_lo"</span>] <span class="op">=</span> counts[<span class="st">"Item"</span>].<span class="bu">map</span>(<span class="kw">lambda</span> i: ci_lo[i<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>counts[<span class="st">"ci_hi"</span>] <span class="op">=</span> counts[<span class="st">"Item"</span>].<span class="bu">map</span>(<span class="kw">lambda</span> i: ci_hi[i<span class="op">-</span><span class="dv">1</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="results-table" class="level3">
+<h3 class="anchored" data-anchor-id="results-table">Results Table</h3>
+<div id="06faaae2" class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="qtrjuvyawz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#qtrjuvyawz table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#qtrjuvyawz thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#qtrjuvyawz p { margin: 0; padding: 0; }
+ #qtrjuvyawz .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #qtrjuvyawz .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #qtrjuvyawz .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #qtrjuvyawz .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #qtrjuvyawz .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qtrjuvyawz .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qtrjuvyawz .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qtrjuvyawz .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #qtrjuvyawz .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #qtrjuvyawz .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #qtrjuvyawz .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #qtrjuvyawz .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #qtrjuvyawz .gt_spanner_row { border-bottom-style: hidden; }
+ #qtrjuvyawz .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #qtrjuvyawz .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #qtrjuvyawz .gt_from_md> :first-child { margin-top: 0; }
+ #qtrjuvyawz .gt_from_md> :last-child { margin-bottom: 0; }
+ #qtrjuvyawz .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #qtrjuvyawz .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #qtrjuvyawz .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #qtrjuvyawz .gt_row_group_first td { border-top-width: 2px; }
+ #qtrjuvyawz .gt_row_group_first th { border-top-width: 2px; }
+ #qtrjuvyawz .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #qtrjuvyawz .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qtrjuvyawz .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #qtrjuvyawz .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #qtrjuvyawz .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #qtrjuvyawz .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #qtrjuvyawz .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #qtrjuvyawz .gt_left { text-align: left; }
+ #qtrjuvyawz .gt_center { text-align: center; }
+ #qtrjuvyawz .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #qtrjuvyawz .gt_font_normal { font-weight: normal; }
+ #qtrjuvyawz .gt_font_bold { font-weight: bold; }
+ #qtrjuvyawz .gt_font_italic { font-style: italic; }
+ #qtrjuvyawz .gt_super { font-size: 65%; }
+ #qtrjuvyawz .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #qtrjuvyawz .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="7" class="gt_heading gt_title gt_font_normal">Counts Analysis</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Sorted by score (% best − % worst) · 4-item tasks only</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Course" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Course</th>
+<th id="Shown" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Shown</th>
+<th id="Best" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Best</th>
+<th id="Worst" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Worst</th>
+<th id="%-Best" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">% Best</th>
+<th id="%-Worst" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">% Worst</th>
+<th id="Score" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Score</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="background-color: #FEF3E2">MGTA 495 · Marketing Analytics</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">274</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">147</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">12</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.536</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.044</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">+0.493</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 453 · Business Analytics</td>
+<td class="gt_row gt_right">270</td>
+<td class="gt_row gt_right">93</td>
+<td class="gt_row gt_right">55</td>
+<td class="gt_row gt_right">0.344</td>
+<td class="gt_row gt_right">0.204</td>
+<td class="gt_row gt_right">+0.141</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 455 · Customer Analytics</td>
+<td class="gt_row gt_right">276</td>
+<td class="gt_row gt_right">104</td>
+<td class="gt_row gt_right">71</td>
+<td class="gt_row gt_right">0.377</td>
+<td class="gt_row gt_right">0.257</td>
+<td class="gt_row gt_right">+0.120</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 452 · Large Data</td>
+<td class="gt_row gt_right">276</td>
+<td class="gt_row gt_right">77</td>
+<td class="gt_row gt_right">60</td>
+<td class="gt_row gt_right">0.279</td>
+<td class="gt_row gt_right">0.217</td>
+<td class="gt_row gt_right">+0.062</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 454 · Capstone Project</td>
+<td class="gt_row gt_right">272</td>
+<td class="gt_row gt_right">72</td>
+<td class="gt_row gt_right">69</td>
+<td class="gt_row gt_right">0.265</td>
+<td class="gt_row gt_right">0.254</td>
+<td class="gt_row gt_right">+0.011</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 464 · SQL</td>
+<td class="gt_row gt_right">274</td>
+<td class="gt_row gt_right">55</td>
+<td class="gt_row gt_right">56</td>
+<td class="gt_row gt_right">0.201</td>
+<td class="gt_row gt_right">0.204</td>
+<td class="gt_row gt_right">-0.004</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 457 · Biz. Intelligence</td>
+<td class="gt_row gt_right">266</td>
+<td class="gt_row gt_right">23</td>
+<td class="gt_row gt_right">55</td>
+<td class="gt_row gt_right">0.086</td>
+<td class="gt_row gt_right">0.207</td>
+<td class="gt_row gt_right">-0.120</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 403 · AI Math &amp; Analytics</td>
+<td class="gt_row gt_right">273</td>
+<td class="gt_row gt_right">33</td>
+<td class="gt_row gt_right">90</td>
+<td class="gt_row gt_right">0.121</td>
+<td class="gt_row gt_right">0.330</td>
+<td class="gt_row gt_right">-0.209</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 451 · Mktg / Fin / Ops</td>
+<td class="gt_row gt_right">272</td>
+<td class="gt_row gt_right">43</td>
+<td class="gt_row gt_right">101</td>
+<td class="gt_row gt_right">0.158</td>
+<td class="gt_row gt_right">0.371</td>
+<td class="gt_row gt_right">-0.213</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #EBF5FB">MGTA 444 · Analytics Consulting</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">267</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">33</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">111</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.124</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.416</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">-0.292</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="score-chart-with-95-bootstrap-cis" class="level3">
+<h3 class="anchored" data-anchor-id="score-chart-with-95-bootstrap-cis">Score Chart with 95% Bootstrap CIs</h3>
+<div id="ccff886d" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-10-output-1.png" width="1026" height="703" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>MGTA 495 · Marketing Analytics</strong> (this very class) dominates — students who were shown it picked it best more than half the time and almost never picked it worst. The next tier is <strong>Business Analytics</strong>, <strong>Customer Analytics</strong>, and <strong>Large Data</strong>. At the bottom sit <strong>Analytics Consulting</strong> and <strong>Mktg/Fin/Ops</strong>, both of which were frequently picked as the least preferred. The bootstrap intervals confirm these broad differences are not noise.</p>
+</section>
+</section>
+<section id="from-maxdiff-data-to-mnl-choices" class="level2">
+<h2 class="anchored" data-anchor-id="from-maxdiff-data-to-mnl-choices">From MaxDiff Data to MNL Choices</h2>
+<section id="the-choice-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-choice-model">The Choice Model</h3>
+<p>The MNL model assigns each course <span class="math inline">\(j\)</span> a latent utility coefficient <span class="math inline">\(\beta_j\)</span>. When a respondent sees a set of four courses <span class="math inline">\(\{a, b, c, d\}\)</span>, the probability that course <span class="math inline">\(b\)</span> is picked <strong>best</strong> follows the soft-max:</p>
+<p><span class="math display">\[
+P(\text{best} = b) = \frac{\exp(\beta_b)}{\exp(\beta_a) + \exp(\beta_b) + \exp(\beta_c) + \exp(\beta_d)}
+\]</span></p>
+<p>After the best is removed, the <strong>worst</strong> is picked from the remaining three — but now with utilities <em>negated</em> (the worst-picker is a best-picker on the reversed scale):</p>
+<p><span class="math display">\[
+P(\text{worst} = c \mid \text{best} = b) = \frac{\exp(-\beta_c)}{\exp(-\beta_a) + \exp(-\beta_c) + \exp(-\beta_d)}
+\]</span></p>
+<p>Each 4-item task therefore contributes <strong>two</strong> MNL observations to the likelihood.</p>
+</section>
+<section id="identifiability" class="level3">
+<h3 class="anchored" data-anchor-id="identifiability">Identifiability</h3>
+<p>The soft-max probability depends only on <em>differences</em> in utility, not absolute levels. Adding any constant to every <span class="math inline">\(\beta\)</span> leaves all probabilities unchanged, so the model is only identified up to a location shift. We fix this by setting <span class="math inline">\(\beta_1 = 0\)</span> (MGTA 403 as the reference) and estimating the remaining <span class="math inline">\(\beta_2, \ldots, \beta_{10}\)</span> — nine free parameters.</p>
+</section>
+<section id="reshaping-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="reshaping-the-data">Reshaping the Data</h3>
+<p>We convert the raw response rows into one record per task:</p>
+<div id="5c46c0cb" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>tasks_df <span class="op">=</span> []</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (resp, task), grp <span class="kw">in</span> df4.groupby([<span class="st">"Record ID"</span>, <span class="st">"Task"</span>]):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    items   <span class="op">=</span> grp[<span class="st">"Item"</span>].values <span class="op">-</span> <span class="dv">1</span>          <span class="co"># 0-indexed</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    rv      <span class="op">=</span> grp[<span class="st">"Response"</span>].values</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    best_p  <span class="op">=</span> <span class="bu">int</span>(np.where(rv <span class="op">==</span>  <span class="dv">1</span>)[<span class="dv">0</span>][<span class="dv">0</span>])   <span class="co"># position in this group</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    worst_p <span class="op">=</span> <span class="bu">int</span>(np.where(rv <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>)[<span class="dv">0</span>][<span class="dv">0</span>])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    tasks_df.append({<span class="st">"items"</span>: items,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"best_pos"</span>: best_p,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"worst_pos"</span>: worst_p})</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total tasks: </span><span class="sc">{</span><span class="bu">len</span>(tasks_df)<span class="sc">}</span><span class="ss">  "</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"(</span><span class="sc">{</span>df4[<span class="st">'Record ID'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> respondents × "</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span>df4<span class="sc">.</span>groupby(<span class="st">'Record ID'</span>)[<span class="st">'Task'</span>]<span class="sc">.</span>nunique()<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss"> tasks)"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"First task — items (0-indexed):"</span>, tasks_df[<span class="dv">0</span>][<span class="st">"items"</span>],</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"  best pos:"</span>, tasks_df[<span class="dv">0</span>][<span class="st">"best_pos"</span>],</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">"  worst pos:"</span>, tasks_df[<span class="dv">0</span>][<span class="st">"worst_pos"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total tasks: 680  (85 respondents × 8 tasks)
+First task — items (0-indexed): [4 6 3 0]   best pos: 1   worst pos: 3</code></pre>
+</div>
+</div>
+<p>The pre-built <code>TASK_ITEMS</code>, <code>BEST_POS</code>, and <code>WORST_POS</code> arrays (built once in the setup cell) hold the same information as numpy matrices, enabling vectorised likelihood evaluation.</p>
+</section>
+</section>
+<section id="mnl-via-maximum-likelihood" class="level2">
+<h2 class="anchored" data-anchor-id="mnl-via-maximum-likelihood">MNL via Maximum Likelihood</h2>
+<section id="log-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="log-likelihood">Log-Likelihood</h3>
+<p>Summing over all <span class="math inline">\(N \cdot T = 680\)</span> tasks, the log-likelihood is:</p>
+<p><span class="math display">\[
+\ell(\boldsymbol{\beta})
+= \sum_{\text{tasks}} \Bigl[
+    \beta_{j^*_b} - \log\!\!\sum_{j \in \text{shown}}\!\exp(\beta_j)
+    - \beta_{j^*_w} - \log\!\!\!\!\sum_{j \in \text{shown}\setminus\{j^*_b\}}\!\!\!\exp(-\beta_j)
+  \Bigr]
+\]</span></p>
+<p>where <span class="math inline">\(j^*_b\)</span> and <span class="math inline">\(j^*_w\)</span> are the best- and worst-picked items. We use <code>scipy.special.logsumexp</code> for numerical stability.</p>
+<div id="3ec1ca93" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_likelihood(beta_free):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""MNL log-likelihood for MaxDiff.</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">    beta_free: 9-vector for items 2–10; item 1 pinned at 0.</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    beta  <span class="op">=</span> np.concatenate([[<span class="fl">0.0</span>], beta_free])   <span class="co"># (10,)</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    utils <span class="op">=</span> beta[TASK_ITEMS]                      <span class="co"># (N_TASKS, 4)</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ── Best observation ──────────────────────────────────────────────</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    ll_best <span class="op">=</span> utils[IDX, BEST_POS] <span class="op">-</span> logsumexp(utils, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ── Worst observation (remaining 3, negated utilities) ────────────</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    mask  <span class="op">=</span> np.ones((N_TASKS, <span class="dv">4</span>), dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    mask[IDX, BEST_POS] <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    neg_rem  <span class="op">=</span> <span class="op">-</span>utils[mask].reshape(N_TASKS, <span class="dv">3</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    ll_worst <span class="op">=</span> <span class="op">-</span>utils[IDX, WORST_POS] <span class="op">-</span> logsumexp(neg_rem, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (ll_best <span class="op">+</span> ll_worst).<span class="bu">sum</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="maximising-the-likelihood" class="level3">
+<h3 class="anchored" data-anchor-id="maximising-the-likelihood">Maximising the Likelihood</h3>
+<div id="3912aa4b" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mle_result <span class="op">=</span> optimize.minimize(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    fun<span class="op">=</span><span class="kw">lambda</span> b: <span class="op">-</span>log_likelihood(b),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    x0<span class="op">=</span>np.zeros(<span class="dv">9</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">"BFGS"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>beta_free_mle <span class="op">=</span> mle_result.x</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>beta_mle      <span class="op">=</span> np.concatenate([[<span class="fl">0.0</span>], beta_free_mle])   <span class="co"># full 10-vector</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Optimiser message:"</span>, mle_result.message)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Log-likelihood at MLE:"</span>, log_likelihood(beta_free_mle).<span class="bu">round</span>(<span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimiser message: Desired error not necessarily achieved due to precision loss.
+Log-likelihood at MLE: -1572.73</code></pre>
+</div>
+</div>
+</section>
+<section id="standard-errors-from-the-hessian" class="level3">
+<h3 class="anchored" data-anchor-id="standard-errors-from-the-hessian">Standard Errors from the Hessian</h3>
+<p>The BFGS algorithm maintains an approximation to the inverse Hessian of <span class="math inline">\(-\ell\)</span>, which equals the covariance matrix of <span class="math inline">\(\hat{\boldsymbol{\beta}}\)</span>:</p>
+<div id="9edb098e" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>se_free <span class="op">=</span> np.sqrt(np.diag(mle_result.hess_inv))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>se_mle  <span class="op">=</span> np.concatenate([[np.nan], se_free])          <span class="co"># item 1 fixed, no SE</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="shares-of-preference" class="level3">
+<h3 class="anchored" data-anchor-id="shares-of-preference">Shares of Preference</h3>
+<p>To make the <span class="math inline">\(\hat\beta\)</span> estimates easier to interpret, we convert them to <strong>shares of preference</strong>:</p>
+<p><span class="math display">\[
+\hat s_j = \frac{\exp(\hat\beta_j)}{\sum_{k=1}^{10}\exp(\hat\beta_k)}
+\]</span></p>
+<p>These shares sum to 1 and answer: <em>“if all 10 classes were on one screen, what fraction of choices would each receive?”</em></p>
+<div id="dbf5c936" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>shares_mle <span class="op">=</span> np.exp(beta_mle) <span class="op">/</span> np.exp(beta_mle).<span class="bu">sum</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="results-table-1" class="level3">
+<h3 class="anchored" data-anchor-id="results-table-1">Results Table</h3>
+<div id="7d544758" class="cell" data-execution_count="15">
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div id="qfnqoqjkcr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#qfnqoqjkcr table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#qfnqoqjkcr thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#qfnqoqjkcr p { margin: 0; padding: 0; }
+ #qfnqoqjkcr .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #qfnqoqjkcr .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #qfnqoqjkcr .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #qfnqoqjkcr .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #qfnqoqjkcr .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #qfnqoqjkcr .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #qfnqoqjkcr .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #qfnqoqjkcr .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #qfnqoqjkcr .gt_spanner_row { border-bottom-style: hidden; }
+ #qfnqoqjkcr .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #qfnqoqjkcr .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #qfnqoqjkcr .gt_from_md> :first-child { margin-top: 0; }
+ #qfnqoqjkcr .gt_from_md> :last-child { margin-bottom: 0; }
+ #qfnqoqjkcr .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #qfnqoqjkcr .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #qfnqoqjkcr .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #qfnqoqjkcr .gt_row_group_first td { border-top-width: 2px; }
+ #qfnqoqjkcr .gt_row_group_first th { border-top-width: 2px; }
+ #qfnqoqjkcr .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #qfnqoqjkcr .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #qfnqoqjkcr .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #qfnqoqjkcr .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #qfnqoqjkcr .gt_left { text-align: left; }
+ #qfnqoqjkcr .gt_center { text-align: center; }
+ #qfnqoqjkcr .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #qfnqoqjkcr .gt_font_normal { font-weight: normal; }
+ #qfnqoqjkcr .gt_font_bold { font-weight: bold; }
+ #qfnqoqjkcr .gt_font_italic { font-style: italic; }
+ #qfnqoqjkcr .gt_super { font-size: 65%; }
+ #qfnqoqjkcr .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #qfnqoqjkcr .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="4" class="gt_heading gt_title gt_font_normal">MNL Maximum Likelihood Estimates</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Reference: MGTA 403 (β₁ = 0) · sorted by share of preference</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Course" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Course</th>
+<th id="β̂" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">β̂</th>
+<th id="SE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">SE</th>
+<th id="Share" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Share</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="background-color: #FEF3E2">MGTA 495 · Marketing Analytics</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">1.630</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.115</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.2839</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 453 · Business Analytics</td>
+<td class="gt_row gt_right">0.744</td>
+<td class="gt_row gt_right">0.130</td>
+<td class="gt_row gt_right">0.1171</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 455 · Customer Analytics</td>
+<td class="gt_row gt_right">0.656</td>
+<td class="gt_row gt_right">0.120</td>
+<td class="gt_row gt_right">0.1072</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 452 · Large Data</td>
+<td class="gt_row gt_right">0.555</td>
+<td class="gt_row gt_right">0.115</td>
+<td class="gt_row gt_right">0.0969</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 454 · Capstone Project</td>
+<td class="gt_row gt_right">0.443</td>
+<td class="gt_row gt_right">0.116</td>
+<td class="gt_row gt_right">0.0867</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 464 · SQL</td>
+<td class="gt_row gt_right">0.438</td>
+<td class="gt_row gt_right">0.109</td>
+<td class="gt_row gt_right">0.0862</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 457 · Biz. Intelligence</td>
+<td class="gt_row gt_right">0.236</td>
+<td class="gt_row gt_right">0.116</td>
+<td class="gt_row gt_right">0.0704</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 403 · AI Math &amp; Analytics</td>
+<td class="gt_row gt_right">0.000</td>
+<td class="gt_row gt_right">—</td>
+<td class="gt_row gt_right">0.0556</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 451 · Mktg / Fin / Ops</td>
+<td class="gt_row gt_right">-0.067</td>
+<td class="gt_row gt_right">0.115</td>
+<td class="gt_row gt_right">0.0520</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #EBF5FB">MGTA 444 · Analytics Consulting</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">-0.239</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.126</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.0438</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="mle-share-chart" class="level3">
+<h3 class="anchored" data-anchor-id="mle-share-chart">MLE Share Chart</h3>
+<div id="554001f9" class="cell" data-execution_count="16">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-17-output-1.png" width="1026" height="703" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The MLE ranking is nearly identical to the counts ranking. <strong>MGTA 495</strong> commands a share of <strong>0.28</strong> — nearly three times as large as any other course. The model makes explicit what the counts analysis hinted at: the preference gap between the top course and the rest is very large.</p>
+</section>
+</section>
+<section id="mnl-via-bayesian-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="mnl-via-bayesian-estimation">MNL via Bayesian Estimation</h2>
+<section id="posterior-and-prior" class="level3">
+<h3 class="anchored" data-anchor-id="posterior-and-prior">Posterior and Prior</h3>
+<p>The Bayesian posterior combines the likelihood with a prior on <span class="math inline">\(\boldsymbol{\beta}\)</span>:</p>
+<p><span class="math display">\[
+\pi(\boldsymbol{\beta} \mid \boldsymbol{y}) \;\propto\; L(\boldsymbol{\beta}) \cdot \pi(\boldsymbol{\beta})
+\]</span></p>
+<p>We use a weakly informative multivariate normal prior <span class="math inline">\(\boldsymbol{\beta} \sim \mathcal{N}(\boldsymbol{0},\; 10 \cdot I)\)</span> — a standard deviation of <span class="math inline">\(\approx 3.2\)</span> on each coefficient, broad enough not to shrink the estimates meaningfully but tight enough to avoid numerical issues.</p>
+<div id="650ae7f6" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_prior(beta_free):</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> stats.norm.logpdf(beta_free, loc<span class="op">=</span><span class="dv">0</span>, scale<span class="op">=</span>np.sqrt(<span class="dv">10</span>)).<span class="bu">sum</span>()</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_posterior(beta_free):</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> log_likelihood(beta_free) <span class="op">+</span> log_prior(beta_free)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="metropolis-hastings-sampler" class="level3">
+<h3 class="anchored" data-anchor-id="metropolis-hastings-sampler">Metropolis-Hastings Sampler</h3>
+<p>We use a <strong>random-walk Metropolis</strong> algorithm. At each iteration we propose a new parameter vector by adding Gaussian noise to the current state, then accept or reject according to the Metropolis ratio:</p>
+<div id="4e75dc70" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> metropolis_hastings(beta0, n_iter, step, seed<span class="op">=</span><span class="dv">42</span>):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    rng    <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    K      <span class="op">=</span> <span class="bu">len</span>(beta0)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    draws  <span class="op">=</span> np.zeros((n_iter, K))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    beta   <span class="op">=</span> beta0.copy()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    lp     <span class="op">=</span> log_posterior(beta)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    n_acc  <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(n_iter):</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        prop    <span class="op">=</span> beta <span class="op">+</span> rng.normal(<span class="dv">0</span>, step, K)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        lp_prop <span class="op">=</span> log_posterior(prop)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.log(rng.uniform()) <span class="op">&lt;</span> lp_prop <span class="op">-</span> lp:   <span class="co"># accept</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>            beta <span class="op">=</span> prop</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>            lp   <span class="op">=</span> lp_prop</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>            n_acc <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>        draws[t] <span class="op">=</span> beta</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> draws, n_acc <span class="op">/</span> n_iter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="tuning-the-step-size" class="level3">
+<h3 class="anchored" data-anchor-id="tuning-the-step-size">Tuning the Step Size</h3>
+<p>The acceptance rate should land between 25% and 40%. A step size of <strong>0.07</strong> achieves this with our 9-dimensional posterior — small enough to stay near the high-probability region, large enough to explore it efficiently.</p>
+<div id="c0313fc2" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>draws, accept_rate <span class="op">=</span> metropolis_hastings(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    beta0  <span class="op">=</span> np.zeros(<span class="dv">9</span>),      <span class="co"># start from prior mean</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    n_iter <span class="op">=</span> <span class="dv">25_000</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    step   <span class="op">=</span> <span class="fl">0.07</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Acceptance rate: </span><span class="sc">{</span>accept_rate<span class="sc">:.3f}</span><span class="ss">  (target: 0.25 – 0.40)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Acceptance rate: 0.354  (target: 0.25 – 0.40)</code></pre>
+</div>
+</div>
+</section>
+<section id="burn-in-and-post-burn-in-draws" class="level3">
+<h3 class="anchored" data-anchor-id="burn-in-and-post-burn-in-draws">Burn-In and Post-Burn-In Draws</h3>
+<p>We discard the first 25% of draws (6,250) as burn-in and keep the remaining 18,750.</p>
+<div id="a1a8feac" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>BURN_IN <span class="op">=</span> <span class="dv">6_250</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>post    <span class="op">=</span> draws[BURN_IN:]   <span class="co"># (18750, 9)</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Post-burn-in draws: </span><span class="sc">{</span><span class="bu">len</span>(post)<span class="sc">:,}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Post-burn-in draws: 18,750</code></pre>
+</div>
+</div>
+</section>
+<section id="trace-plots" class="level3">
+<h3 class="anchored" data-anchor-id="trace-plots">Trace Plots</h3>
+<p>A healthy chain looks like a “fuzzy caterpillar” — rapid up-and-down oscillations around a stable mean, with no systematic drift.</p>
+<div id="9f6b7cdb" class="cell" data-execution_count="21">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-22-output-1.png" width="1170" height="768" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>All three traces show the characteristic fuzzy-caterpillar pattern with no drift, confirming the chain has converged.</p>
+</section>
+<section id="posterior-summaries" class="level3">
+<h3 class="anchored" data-anchor-id="posterior-summaries">Posterior Summaries</h3>
+<div id="94f34a21" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Full beta (including pinned β₁ = 0)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>post_full <span class="op">=</span> np.column_stack([np.zeros(<span class="bu">len</span>(post)), post])  <span class="co"># (18750, 10)</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>beta_post_mean <span class="op">=</span> post_full.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>beta_post_lo   <span class="op">=</span> np.percentile(post_full, <span class="fl">2.5</span>,  axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>beta_post_hi   <span class="op">=</span> np.percentile(post_full, <span class="fl">97.5</span>, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Posterior mean shares (push each draw through softmax)</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>exp_draws     <span class="op">=</span> np.exp(post_full)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>shares_draws  <span class="op">=</span> exp_draws <span class="op">/</span> exp_draws.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>shares_post_mean <span class="op">=</span> shares_draws.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>shares_post_lo   <span class="op">=</span> np.percentile(shares_draws, <span class="fl">2.5</span>,  axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>shares_post_hi   <span class="op">=</span> np.percentile(shares_draws, <span class="fl">97.5</span>, axis<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="bayesian-results-table" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-results-table">Bayesian Results Table</h3>
+<div id="a24231e1" class="cell" data-execution_count="23">
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div id="raaoyeazli" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#raaoyeazli table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#raaoyeazli thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#raaoyeazli p { margin: 0; padding: 0; }
+ #raaoyeazli .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #raaoyeazli .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #raaoyeazli .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #raaoyeazli .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #raaoyeazli .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #raaoyeazli .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #raaoyeazli .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #raaoyeazli .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #raaoyeazli .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #raaoyeazli .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #raaoyeazli .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #raaoyeazli .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #raaoyeazli .gt_spanner_row { border-bottom-style: hidden; }
+ #raaoyeazli .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #raaoyeazli .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #raaoyeazli .gt_from_md> :first-child { margin-top: 0; }
+ #raaoyeazli .gt_from_md> :last-child { margin-bottom: 0; }
+ #raaoyeazli .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #raaoyeazli .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #raaoyeazli .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #raaoyeazli .gt_row_group_first td { border-top-width: 2px; }
+ #raaoyeazli .gt_row_group_first th { border-top-width: 2px; }
+ #raaoyeazli .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #raaoyeazli .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #raaoyeazli .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #raaoyeazli .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #raaoyeazli .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #raaoyeazli .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #raaoyeazli .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #raaoyeazli .gt_left { text-align: left; }
+ #raaoyeazli .gt_center { text-align: center; }
+ #raaoyeazli .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #raaoyeazli .gt_font_normal { font-weight: normal; }
+ #raaoyeazli .gt_font_bold { font-weight: bold; }
+ #raaoyeazli .gt_font_italic { font-style: italic; }
+ #raaoyeazli .gt_super { font-size: 65%; }
+ #raaoyeazli .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #raaoyeazli .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal">MNL Bayesian Estimates (Metropolis-Hastings)</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">25,000 iterations · 6,250 burn-in · prior N(0, 10·I) · sorted by posterior share</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Course" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Course</th>
+<th id="Post.-mean-β" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Post. mean β</th>
+<th id="CI-2.5%" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">CI 2.5%</th>
+<th id="CI-97.5%" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">CI 97.5%</th>
+<th id="Post.-share" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Post. share</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="background-color: #FEF3E2">MGTA 495 · Marketing Analytics</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">1.626</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">1.346</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">1.907</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.2825</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 453 · Business Analytics</td>
+<td class="gt_row gt_right">0.743</td>
+<td class="gt_row gt_right">0.490</td>
+<td class="gt_row gt_right">1.010</td>
+<td class="gt_row gt_right">0.1169</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 455 · Customer Analytics</td>
+<td class="gt_row gt_right">0.659</td>
+<td class="gt_row gt_right">0.399</td>
+<td class="gt_row gt_right">0.916</td>
+<td class="gt_row gt_right">0.1075</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 452 · Large Data</td>
+<td class="gt_row gt_right">0.557</td>
+<td class="gt_row gt_right">0.297</td>
+<td class="gt_row gt_right">0.826</td>
+<td class="gt_row gt_right">0.0971</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 454 · Capstone Project</td>
+<td class="gt_row gt_right">0.449</td>
+<td class="gt_row gt_right">0.199</td>
+<td class="gt_row gt_right">0.719</td>
+<td class="gt_row gt_right">0.0872</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 464 · SQL</td>
+<td class="gt_row gt_right">0.441</td>
+<td class="gt_row gt_right">0.177</td>
+<td class="gt_row gt_right">0.705</td>
+<td class="gt_row gt_right">0.0864</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 457 · Biz. Intelligence</td>
+<td class="gt_row gt_right">0.241</td>
+<td class="gt_row gt_right">-0.004</td>
+<td class="gt_row gt_right">0.500</td>
+<td class="gt_row gt_right">0.0708</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 403 · AI Math &amp; Analytics</td>
+<td class="gt_row gt_right">0.000</td>
+<td class="gt_row gt_right">0.000</td>
+<td class="gt_row gt_right">0.000</td>
+<td class="gt_row gt_right">0.0556</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 451 · Mktg / Fin / Ops</td>
+<td class="gt_row gt_right">-0.071</td>
+<td class="gt_row gt_right">-0.331</td>
+<td class="gt_row gt_right">0.186</td>
+<td class="gt_row gt_right">0.0519</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #EBF5FB">MGTA 444 · Analytics Consulting</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">-0.233</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">-0.503</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.031</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.0441</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="bayesian-share-chart-with-credible-intervals" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-share-chart-with-credible-intervals">Bayesian Share Chart with Credible Intervals</h3>
+<div id="f77b6f19" class="cell" data-execution_count="24">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-25-output-1.png" width="1156" height="703" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The posterior means are very close to the MLE point estimates — the diffuse prior has little effect with 680 observations. The posterior standard deviations (≈ 0.14) are modestly larger than the MLE standard errors (≈ 0.12) because the prior adds a small regularisation term that widens the uncertainty slightly. The credible intervals make it easy to see which courses are significantly preferred over the reference without any additional calculations.</p>
+</section>
+</section>
+<section id="comparing-the-three-methods" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-the-three-methods">Comparing the Three Methods</h2>
+<div id="ec0ecc3e" class="cell" data-execution_count="25">
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div id="yhdzfercjs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#yhdzfercjs table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#yhdzfercjs thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#yhdzfercjs p { margin: 0; padding: 0; }
+ #yhdzfercjs .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #yhdzfercjs .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #yhdzfercjs .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #yhdzfercjs .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #yhdzfercjs .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #yhdzfercjs .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #yhdzfercjs .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #yhdzfercjs .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #yhdzfercjs .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #yhdzfercjs .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #yhdzfercjs .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #yhdzfercjs .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #yhdzfercjs .gt_spanner_row { border-bottom-style: hidden; }
+ #yhdzfercjs .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #yhdzfercjs .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #yhdzfercjs .gt_from_md> :first-child { margin-top: 0; }
+ #yhdzfercjs .gt_from_md> :last-child { margin-bottom: 0; }
+ #yhdzfercjs .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #yhdzfercjs .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #yhdzfercjs .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #yhdzfercjs .gt_row_group_first td { border-top-width: 2px; }
+ #yhdzfercjs .gt_row_group_first th { border-top-width: 2px; }
+ #yhdzfercjs .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #yhdzfercjs .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #yhdzfercjs .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #yhdzfercjs .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #yhdzfercjs .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #yhdzfercjs .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #yhdzfercjs .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #yhdzfercjs .gt_left { text-align: left; }
+ #yhdzfercjs .gt_center { text-align: center; }
+ #yhdzfercjs .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #yhdzfercjs .gt_font_normal { font-weight: normal; }
+ #yhdzfercjs .gt_font_bold { font-weight: bold; }
+ #yhdzfercjs .gt_font_italic { font-style: italic; }
+ #yhdzfercjs .gt_super { font-size: 65%; }
+ #yhdzfercjs .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #yhdzfercjs .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="7" class="gt_heading gt_title gt_font_normal">Three-Method Comparison</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Sorted by MLE rank</td>
+</tr>
+<tr class="gt_col_headings gt_spanner_row header">
+<th rowspan="2" id="Course" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Course</th>
+<th colspan="2" id="Counts" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">Counts</span></th>
+<th colspan="2" id="MLE" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">MLE</span></th>
+<th colspan="2" id="Bayes" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">Bayes</span></th>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Counts-score" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Counts score</th>
+<th id="Counts-rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Counts rank</th>
+<th id="MLE-share" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">MLE share</th>
+<th id="MLE-rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">MLE rank</th>
+<th id="Bayes-share" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Bayes share</th>
+<th id="Bayes-rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Bayes rank</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="background-color: #FEF3E2">MGTA 495 · Marketing Analytics</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">+0.493</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">1</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.2839</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">1</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">0.2825</td>
+<td class="gt_row gt_right" style="background-color: #FEF3E2">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 453 · Business Analytics</td>
+<td class="gt_row gt_right">+0.141</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.1171</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">0.1169</td>
+<td class="gt_row gt_right">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 455 · Customer Analytics</td>
+<td class="gt_row gt_right">+0.120</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.1072</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">0.1075</td>
+<td class="gt_row gt_right">3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 452 · Large Data</td>
+<td class="gt_row gt_right">+0.062</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">0.0969</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">0.0971</td>
+<td class="gt_row gt_right">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 454 · Capstone Project</td>
+<td class="gt_row gt_right">+0.011</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">0.0867</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">0.0872</td>
+<td class="gt_row gt_right">5</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 464 · SQL</td>
+<td class="gt_row gt_right">-0.004</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">0.0862</td>
+<td class="gt_row gt_right">6</td>
+<td class="gt_row gt_right">0.0864</td>
+<td class="gt_row gt_right">6</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 457 · Biz. Intelligence</td>
+<td class="gt_row gt_right">-0.120</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">0.0704</td>
+<td class="gt_row gt_right">7</td>
+<td class="gt_row gt_right">0.0708</td>
+<td class="gt_row gt_right">7</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left">MGTA 403 · AI Math &amp; Analytics</td>
+<td class="gt_row gt_right">-0.209</td>
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">0.0556</td>
+<td class="gt_row gt_right">8</td>
+<td class="gt_row gt_right">0.0556</td>
+<td class="gt_row gt_right">8</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">MGTA 451 · Mktg / Fin / Ops</td>
+<td class="gt_row gt_right">-0.213</td>
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_right">0.0520</td>
+<td class="gt_row gt_right">9</td>
+<td class="gt_row gt_right">0.0519</td>
+<td class="gt_row gt_right">9</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #EBF5FB">MGTA 444 · Analytics Consulting</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">-0.292</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">10</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.0438</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">10</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">0.0441</td>
+<td class="gt_row gt_right" style="background-color: #EBF5FB">10</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+<section id="side-by-side-visual-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="side-by-side-visual-comparison">Side-by-Side Visual Comparison</h3>
+<div id="0fe8a8dc" class="cell" data-execution_count="26">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-27-output-1.png" width="2066" height="827" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Where all three agree:</strong> The top position (MGTA 495) and the bottom positions (Analytics Consulting, Mktg/Fin/Ops) are stable across all methods. When preferences are extreme, every approach finds them.</p>
+<p><strong>Where they differ:</strong> Items 2 (SQL) and 8 (Capstone) swap positions between the counts method and the MNL methods. This is typical in the middle of the ranking, where counts scores are near zero and small sample noise can flip the order. The MNL model uses information about <em>all</em> non-chosen items on each screen, extracting more signal and producing a more stable middle ranking.</p>
+<p><strong>What MNL adds over counts:</strong> The counts score ignores context. If a course always appeared alongside the two most-hated courses, it would look better than it deserves. The MNL controls for this by modelling the full choice set explicitly — every item that was <em>shown but not chosen</em> is evidence about its utility.</p>
+<p><strong>What Bayes adds over MLE:</strong> Credible intervals on derived quantities like shares of preference come for free from MCMC — just push each draw through the softmax and take quantiles. Getting equivalent intervals from MLE requires the delta method, which involves computing derivatives of the softmax with respect to each <span class="math inline">\(\beta\)</span>. The Bayesian approach also points toward natural extensions: a hierarchical version of this model would estimate <em>individual-level</em> preferences, allowing the analyst to segment respondents by course affinity.</p>
+</section>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+<section id="substantive-findings" class="level3">
+<h3 class="anchored" data-anchor-id="substantive-findings">Substantive Findings</h3>
+<p>Students in this MSBA cohort overwhelmingly prefer <strong>MGTA 495 · Marketing Analytics</strong> (this course) — its share of preference is roughly 28%, nearly three times larger than the runner-up. This could reflect genuine enthusiasm for marketing analytics, survivor bias (the survey was administered in a marketing analytics course), or the simple fact that students tend to prefer what is immediately salient and familiar.</p>
+<p>The second tier — <strong>Business Analytics</strong>, <strong>Customer Analytics</strong>, and <strong>Large Data</strong> — are well-regarded but much closer to each other. At the bottom, <strong>Analytics Consulting</strong> and <strong>Mktg/Fin/Ops</strong> are consistently least preferred, possibly because they are perceived as less technical or less directly connected to career goals.</p>
+</section>
+<section id="methodological-takeaways" class="level3">
+<h3 class="anchored" data-anchor-id="methodological-takeaways">Methodological Takeaways</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 38%">
+<col style="width: 61%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Counts</strong></td>
+<td>Quick dashboard summary; easy to explain to a non-technical audience; no model assumptions</td>
+</tr>
+<tr class="even">
+<td><strong>MLE MNL</strong></td>
+<td>Rigorous point estimates with classical standard errors; good when you need a single defensible number</td>
+</tr>
+<tr class="odd">
+<td><strong>Bayesian MNL</strong></td>
+<td>When uncertainty on derived quantities matters; when you plan to extend the model (e.g., hierarchical individual preferences); when credible intervals are more natural than confidence intervals</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="caveats" class="level3">
+<h3 class="anchored" data-anchor-id="caveats">Caveats</h3>
+<p>The survey was administered to a self-selected sample of MSBA students — those enrolled in a marketing analytics elective. Preferences almost certainly differ for students in other electives, and may change as students progress through the program and gain experience with each course. Presentation order, prior coursework, and anticipated job placement may all influence responses in ways we cannot observe.</p>
+</section>
+<section id="next-steps" class="level3">
+<h3 class="anchored" data-anchor-id="next-steps">Next Steps</h3>
+<p>The most natural extension is a <strong>hierarchical (mixed) MNL model</strong> that gives each respondent their own <span class="math inline">\(\boldsymbol{\beta}\)</span>, drawn from a population distribution. This would reveal whether preference for, say, SQL is uniformly spread across the class or concentrated in a subset of technically inclined students — information that could guide curriculum design and elective sequencing. With 85 respondents the data are thin for such a model, but they would support it.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
