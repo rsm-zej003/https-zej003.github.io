@@ -1,0 +1,391 @@
+---
+title: "Key Drivers Analysis"
+subtitle: "Six Methods for Identifying What Actually Moves Customer Satisfaction"
+author: "Zejun Jiang"
+date: 2026-06-06
+categories: [statistics, variable importance, Shapley values, random forest, marketing analytics]
+format:
+  html:
+    embed-resources: false
+---
+
+```{python}
+#| include: false
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import seaborn as sns
+import pandas as pd
+import numpy as np
+from scipy import stats
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from itertools import combinations
+import math
+from great_tables import GT, loc, style
+from IPython.display import display
+
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "figure.dpi": 130,
+})
+
+df = pd.read_csv("../hw/hw5/data_for_drivers_analysis.csv")
+
+PREDICTORS = ['trust', 'build', 'differs', 'easy', 'appealing',
+              'rewarding', 'popular', 'service', 'impact']
+
+LABELS = {
+    'trust':     'Trust',
+    'build':     'Build Quality',
+    'differs':   'Differentiated',
+    'easy':      'Easy to Use',
+    'appealing': 'Appealing',
+    'rewarding': 'Rewarding',
+    'popular':   'Popular',
+    'service':   'Service',
+    'impact':    'Impactful',
+}
+
+y  = df['satisfaction'].values.astype(float)
+X  = df[PREDICTORS].values.astype(float)
+p  = len(PREDICTORS)
+n  = len(y)
+
+Xs = StandardScaler().fit_transform(X)
+ys = StandardScaler().fit_transform(y.reshape(-1, 1)).ravel()
+```
+
+
+## Introduction
+
+A brand manager wants to improve customer satisfaction. She has survey data on nine product attributes — trust, build quality, ease of use, and six more — along with an overall satisfaction rating from each respondent. The obvious first step is to ask: *which of these attributes actually drive satisfaction?*
+
+This is harder than it sounds. When attributes are positively correlated with each other (customers who trust a brand tend to find it appealing too), a simple ranking by correlation gives a distorted picture. Regression can help but produces coefficients that are sensitive to multicollinearity. The research community has converged on a toolkit of **key driver analysis** methods, each making different trade-offs between simplicity, interpretability, and statistical rigor.
+
+This post applies six methods to the same dataset and compares what each tells us:
+
+| Method | What it measures |
+|--------|-----------------|
+| Pearson correlation | Raw linear association with satisfaction |
+| Standardised regression coefficient | Unique linear contribution, accounting for other drivers |
+| Drop-one (usefulness) | Unique contribution to R² when a driver is removed |
+| Shapley values | Fair allocation of R² using cooperative game theory |
+| Johnson's relative weights | Orthogonal-rotation decomposition of R² |
+| Random forest Gini decrease | Non-linear importance from an ensemble of trees |
+
+
+## The Data
+
+```{python}
+print(f"Respondents: {n:,}   |   Brands: {df['brand'].nunique()}   |   Drivers: {p}")
+print(f"Satisfaction scale: {int(y.min())}–{int(y.max())}   |   Mean: {y.mean():.2f}   |   SD: {y.std():.2f}")
+print()
+print("Driver variables (all binary 0/1):")
+for c in PREDICTORS:
+    print(f"  {LABELS[c]:<20}  mean = {df[c].mean():.3f}")
+```
+
+The outcome variable is **satisfaction** (1–5 scale). All nine drivers are binary endorsements — a respondent either agreed that the brand has that quality (1) or not (0). The data pool responses across 10 brands; the analysis is at the pooled level.
+
+
+## Six Methods, One Dataset
+
+### 1 · Pearson Correlation
+
+The starting point: how strongly does each driver correlate with satisfaction?
+
+```{python}
+pearson = {pr: stats.pearsonr(df[pr], y)[0] for pr in PREDICTORS}
+```
+
+Pearson correlation is easy to compute and explain, but it ignores that drivers share variance. If **impact** and **trust** are correlated, their individual correlations with satisfaction overlap — both appear important even when only one is causally driving the outcome.
+
+---
+
+### 2 · Standardised Regression Coefficient
+
+Running a multiple regression with all drivers simultaneously controls for overlap. The **standardised beta** (regressing z-scored satisfaction on z-scored drivers) tells us how many standard deviations satisfaction changes per standard-deviation increase in each driver, *holding the other drivers fixed*.
+
+```{python}
+std_beta = dict(zip(
+    PREDICTORS,
+    LinearRegression().fit(Xs, ys).coef_
+))
+
+r2_full = LinearRegression().fit(X, y).score(X, y)
+print(f"Full-model R² = {r2_full:.4f}")
+```
+
+Standardised betas correctly account for multicollinearity, but they can be unstable when drivers are highly correlated — small data changes can flip signs and magnitudes.
+
+---
+
+### 3 · Drop-One (Usefulness)
+
+For each driver, we measure how much **R² drops when that driver is removed** from the full model. This quantity, sometimes called *usefulness*, isolates the unique predictive contribution of each variable.
+
+```{python}
+drop_one_raw = {}
+for i, pr in enumerate(PREDICTORS):
+    X_drop = np.delete(X, i, axis=1)
+    r2_drop = LinearRegression().fit(X_drop, y).score(X_drop, y)
+    drop_one_raw[pr] = r2_full - r2_drop
+
+drop_one_pct = {pr: v / sum(drop_one_raw.values()) * 100
+                for pr, v in drop_one_raw.items()}
+```
+
+Drop-one is the most conservative measure of importance: it only credits a driver for what it contributes *uniquely*, beyond all other drivers. Highly redundant drivers — those whose predictive information is duplicated elsewhere — score near zero, even if they correlate strongly with satisfaction on their own.
+
+---
+
+### 4 · Shapley Values
+
+Shapley values originate in cooperative game theory. Each driver is a "player," the team's joint payoff is R², and Shapley values divide that payoff **fairly** — accounting for every possible order in which drivers could enter the model.
+
+For driver $j$, its Shapley value is the average of its marginal contributions across all $p!$ orderings:
+
+$$
+\phi_j = \frac{1}{p!}\sum_{\text{all orderings}} \bigl[R^2(S^{j}_{+}) - R^2(S^{j}_{-})\bigr]
+$$
+
+where $S^{j}_{+}$ is the set of drivers entering before $j$ plus $j$ itself, and $S^{j}_{-}$ excludes $j$.
+
+An equivalent, computationally convenient form averages over all subsets rather than orderings:
+
+$$
+\phi_j = \sum_{S \subseteq P \setminus \{j\}} \frac{|S|!\,(p-|S|-1)!}{p!}\,\bigl[R^2(S \cup \{j\}) - R^2(S)\bigr]
+$$
+
+With $p = 9$ drivers there are $2^9 = 512$ subsets to evaluate — small enough to do exactly.
+
+```{python}
+# Pre-compute R² for every subset of drivers (512 total)
+r2_cache = {}
+for k in range(p + 1):
+    for S in combinations(range(p), k):
+        if k == 0:
+            r2_cache[S] = 0.0
+        else:
+            r2_cache[S] = LinearRegression().fit(X[:, list(S)], y).score(
+                              X[:, list(S)], y)
+
+# Compute each driver's Shapley value
+shapley_raw = {}
+for j, pr in enumerate(PREDICTORS):
+    others = [i for i in range(p) if i != j]
+    sv = 0.0
+    for k in range(p):
+        for S in combinations(others, k):
+            weight  = math.factorial(k) * math.factorial(p - k - 1) / math.factorial(p)
+            S_plus  = tuple(sorted(S + (j,)))
+            sv     += weight * (r2_cache[S_plus] - r2_cache[S])
+    shapley_raw[pr] = sv
+
+print(f"Shapley values sum to: {sum(shapley_raw.values()):.4f}  (R² = {r2_full:.4f})")
+shapley_pct = {pr: v / sum(shapley_raw.values()) * 100
+               for pr, v in shapley_raw.items()}
+```
+
+By construction the Shapley values **sum exactly to R²** — they partition the explained variance cleanly across all drivers. Shared variance is divided proportionally: if impact and trust jointly explain 10 pp of R² and each contributes equally in isolation, each receives 5 pp.
+
+---
+
+### 5 · Johnson's Relative Weights
+
+Johnson (2000) proposed an elegant closed-form approximation to Shapley values. The idea: rotate the predictor space into orthogonal components, regress satisfaction on those components, then rotate the R² contributions back to the original predictors.
+
+**Algorithm:**
+
+1. Eigendecompose the predictor correlation matrix: $\mathbf{R}_{XX} = \mathbf{P}\boldsymbol{\Lambda}\mathbf{P}^\top$
+2. Construct orthogonal predictors: $\mathbf{Z} = \mathbf{X}_\text{std}\,\mathbf{P}\boldsymbol{\Lambda}^{-1/2}$
+3. Regress $y$ on $\mathbf{Z}$: each column $k$ gets correlation $r_k$ with $y$
+4. Map $r_k^2$ back through the rotation: $\varepsilon_j = \sum_k P_{jk}^2 \cdot r_k^2$
+
+```{python}
+R_xx = np.corrcoef(Xs.T)                    # predictor correlation matrix
+eigvals, eigvecs = np.linalg.eigh(R_xx)    # eigendecomposition
+Z = Xs @ eigvecs @ np.diag(eigvals**(-0.5)) # orthogonal components
+
+# r²(Z_k, y_std) for each component
+r2_comp = np.array([np.corrcoef(Z[:, k], ys)[0, 1]**2 for k in range(p)])
+
+# Map back to original predictors: epsilon_j = sum_k P_{jk}^2 * r2_comp[k]
+johnson_raw = {pr: float((eigvecs[i]**2) @ r2_comp)
+               for i, pr in enumerate(PREDICTORS)}
+
+print(f"Johnson weights sum to: {sum(johnson_raw.values()):.4f}  (R² = {r2_full:.4f})")
+johnson_pct = {pr: v / sum(johnson_raw.values()) * 100
+               for pr, v in johnson_raw.items()}
+```
+
+Because the rotation distributes variance across all components, Johnson weights tend to be more **uniform** than Shapley values when predictors share a large common factor.
+
+---
+
+### 6 · Random Forest Gini Decrease
+
+The first five methods all assume a **linear** relationship between drivers and satisfaction. A random forest makes no such assumption: it builds an ensemble of decision trees, and variable importance is measured by the total **decrease in Gini impurity** (for classification) or variance (for regression) when a variable is used to split nodes, averaged over all trees.
+
+```{python}
+rf = RandomForestClassifier(
+    n_estimators=500, random_state=42, n_jobs=-1
+)
+rf.fit(X, y.astype(int))
+rf_gini_raw = dict(zip(PREDICTORS, rf.feature_importances_))
+rf_gini_pct = {pr: v * 100 for pr, v in rf_gini_raw.items()}   # already sum to 1
+```
+
+The Gini decrease captures non-linear and interaction effects invisible to regression-based methods. It also tends toward **equal sharing** when variables can substitute for each other in a tree split.
+
+
+## The Key Drivers Table
+
+```{python}
+#| echo: false
+
+# Collect everything into a tidy DataFrame
+results = pd.DataFrame({
+    "Predictor":  [LABELS[pr] for pr in PREDICTORS],
+    "Pearson r":  [pearson[pr]     for pr in PREDICTORS],
+    "Std. Beta":  [std_beta[pr]    for pr in PREDICTORS],
+    "Drop-one %": [drop_one_pct[pr]  for pr in PREDICTORS],
+    "Shapley %":  [shapley_pct[pr]   for pr in PREDICTORS],
+    "Johnson %":  [johnson_pct[pr]   for pr in PREDICTORS],
+    "RF Gini %":  [rf_gini_pct[pr]   for pr in PREDICTORS],
+}).sort_values("Shapley %", ascending=False).reset_index(drop=True)
+
+results_disp = results.copy()
+results_disp["Pearson r"] = results_disp["Pearson r"].map(lambda x: f"{x:.3f}")
+results_disp["Std. Beta"] = results_disp["Std. Beta"].map(lambda x: f"{x:.3f}")
+for col in ["Drop-one %","Shapley %","Johnson %","RF Gini %"]:
+    results_disp[col] = results_disp[col].map(lambda x: f"{x:.1f}%")
+
+(
+    GT(results_disp)
+    .tab_header(
+        title="Key Drivers of Customer Satisfaction",
+        subtitle=f"n = {n:,} respondents · full-model R² = {r2_full:.3f} · sorted by Shapley value"
+    )
+    .tab_spanner(label="Linear methods",
+                 columns=["Pearson r","Std. Beta","Drop-one %","Shapley %","Johnson %"])
+    .tab_spanner(label="Tree-based", columns=["RF Gini %"])
+    .tab_style(style=style.text(weight="bold"), locations=loc.column_labels())
+    .tab_style(style=style.fill(color="#FEF3E2"), locations=loc.body(rows=[0]))
+    .tab_style(style=style.fill(color="#FEF9E7"), locations=loc.body(rows=[1]))
+    .tab_style(style=style.fill(color="#EBF5FB"), locations=loc.body(rows=[8]))
+    .cols_align(align="left",  columns=["Predictor"])
+    .cols_align(align="right", columns=["Pearson r","Std. Beta","Drop-one %",
+                                         "Shapley %","Johnson %","RF Gini %"])
+)
+```
+
+
+## Visual Comparison Across Methods
+
+```{python}
+#| echo: false
+# Importance-only metrics (%), normalized for visual comparison
+importance_cols = ["Drop-one %","Shapley %","Johnson %","RF Gini %"]
+method_labels   = ["Drop-one\n(usefulness)","Shapley\nvalues","Johnson\nrel. weights","RF Gini\ndecrease"]
+
+# Sort drivers by Shapley rank
+sorted_drivers = results["Predictor"].tolist()[::-1]  # bottom-to-top for barh
+sorted_results = results.set_index("Predictor").loc[sorted_drivers]
+
+fig, axes = plt.subplots(1, 4, figsize=(14, 5.5), sharey=True)
+
+CMAP = plt.cm.YlOrRd
+
+for ax, col, method_label in zip(axes, importance_cols, method_labels):
+    vals = sorted_results[col].values
+    colors = CMAP(vals / vals.max())
+    bars = ax.barh(sorted_drivers, vals, color=colors, edgecolor="white",
+                   linewidth=0.4, height=0.7)
+    ax.set_xlabel("% of total importance", fontsize=9)
+    ax.set_title(method_label, fontsize=10, fontweight="bold")
+    ax.tick_params(axis="y", labelsize=8.5)
+    for bar, v in zip(bars, vals):
+        ax.text(bar.get_width() + 0.3, bar.get_y() + bar.get_height()/2,
+                f"{v:.1f}", va="center", fontsize=7.5, color="#444")
+
+fig.suptitle("Importance Rankings Across Four Methods\n(sorted by Shapley value, highest → lowest)",
+             fontsize=11, fontweight="bold")
+fig.tight_layout()
+from IPython.display import display; display(fig); plt.close()
+```
+
+```{python}
+#| echo: false
+# Heatmap: predictors × methods
+methods_for_heat = ["Pearson r","Std. Beta","Drop-one %","Shapley %","Johnson %","RF Gini %"]
+heat_data = results.set_index("Predictor")[methods_for_heat].copy()
+
+# For Pearson r and Std. Beta: keep signed; others: raw %
+# Normalise each column 0–1 for colour, but display raw values
+heat_norm = heat_data.copy()
+for col in heat_norm.columns:
+    cmin, cmax = heat_norm[col].min(), heat_norm[col].max()
+    heat_norm[col] = (heat_norm[col] - cmin) / (cmax - cmin)
+
+fig, ax = plt.subplots(figsize=(9, 4.5))
+im = ax.imshow(heat_norm.values, cmap="YlOrRd", aspect="auto", vmin=0, vmax=1)
+
+ax.set_xticks(range(len(methods_for_heat)))
+ax.set_xticklabels(["Pearson r","Std. β","Drop-one %","Shapley %","Johnson %","RF Gini %"],
+                   fontsize=9)
+ax.set_yticks(range(len(sorted_drivers[::-1])))
+ax.set_yticklabels(sorted_drivers[::-1], fontsize=9)
+
+# Annotate cells with raw values
+raw_vals = results.set_index("Predictor").loc[sorted_drivers[::-1], methods_for_heat]
+for i, driver in enumerate(sorted_drivers[::-1]):
+    for j, col in enumerate(methods_for_heat):
+        v = raw_vals.loc[driver, col]
+        fmt = f"{v:.3f}" if col in ["Pearson r","Std. Beta"] else f"{v:.1f}%"
+        color = "white" if heat_norm.loc[driver, col] > 0.55 else "#333"
+        ax.text(j, i, fmt, ha="center", va="center", fontsize=7.5, color=color)
+
+ax.set_title("Key Drivers Heat Map\n(columns normalised 0–1; values shown in cells)",
+             fontsize=11, fontweight="bold")
+fig.tight_layout()
+from IPython.display import display; display(fig); plt.close()
+```
+
+
+## Discussion
+
+### Three Tiers of Drivers
+
+All six methods consistently identify the same top tier: **Impactful** and **Trust** are the primary drivers of satisfaction, with **Service** in a clear third place. The remaining six attributes fill a lower tier, with **Popular** and **Rewarding** consistently at the bottom.
+
+The differences between methods appear in the *magnitudes* and the *sharpness* of the contrast between top and bottom drivers.
+
+### Why Methods Disagree
+
+**Drop-one is the most extreme.** It credits Impact with 43% of all importance, Trust with 31%, and Service with 18% — leaving the remaining six attributes sharing less than 8% combined. This reflects its design: drop-one measures *unique* contribution. A driver that is correlated with other important drivers receives almost no credit, even if it is genuinely associated with satisfaction.
+
+**Shapley gives a balanced but differentiated picture.** By averaging contributions across all possible entry orders, Shapley shares credit for overlapping variance. Impact (21.6%), Trust (19.8%), and Service (16.9%) still lead, but the gap to the middle tier is much smaller. This is the method that most closely resembles what a fair "audit" of R² should look like.
+
+**Johnson's relative weights are the flattest.** The orthogonal-rotation approach distributes weight more uniformly when predictors share a large common factor. Here the nine binary attributes are moderately correlated (all positive product-quality signals), so Johnson assigns 8–13% to each driver — almost no information for distinguishing primary from secondary drivers.
+
+**The random forest is even flatter.** The Gini-decrease rankings (9–13%) are nearly uniform, suggesting that the tree ensemble can use any of the nine attributes interchangeably to split nodes. This is consistent with a data-generating process that has a strong common factor (overall brand quality) captured redundantly by all nine items.
+
+### What Each Method Is Good For
+
+| Goal | Best method |
+|------|-------------|
+| Quick descriptive summary | Pearson r |
+| Controlling for redundancy (unique contribution) | Drop-one |
+| Fair attribution accounting for shared variance | Shapley values |
+| Fast approximation of Shapley | Johnson relative weights |
+| Non-linear / interaction effects | RF Gini decrease |
+
+For this dataset, the three linear methods that correct for multicollinearity (standardised beta, drop-one, Shapley) converge on the same story: **Impact and Trust are the priority levers for improving satisfaction**. Service matters too but is a distant third. The remaining six attributes are unlikely to move the needle if resources are limited.
+
+The RF Gini result serves as a useful robustness check: even a non-linear model with 500 trees finds it difficult to distinguish the drivers, which suggests the true signal in this data is modest (R² ≈ 0.11) and spread across correlated attributes rather than concentrated in one or two.
