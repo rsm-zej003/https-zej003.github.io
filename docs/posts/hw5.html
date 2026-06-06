@@ -192,23 +192,30 @@ window.Quarto = {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">The Data</a></li>
+  <li><a href="#exploring-the-data" id="toc-exploring-the-data" class="nav-link" data-scroll-target="#exploring-the-data">Exploring the Data</a></li>
   <li><a href="#six-methods-one-dataset" id="toc-six-methods-one-dataset" class="nav-link" data-scroll-target="#six-methods-one-dataset">Six Methods, One Dataset</a>
   <ul class="collapse">
   <li><a href="#pearson-correlation" id="toc-pearson-correlation" class="nav-link" data-scroll-target="#pearson-correlation">1 · Pearson Correlation</a></li>
   <li><a href="#standardised-regression-coefficient" id="toc-standardised-regression-coefficient" class="nav-link" data-scroll-target="#standardised-regression-coefficient">2 · Standardised Regression Coefficient</a></li>
   <li><a href="#drop-one-usefulness" id="toc-drop-one-usefulness" class="nav-link" data-scroll-target="#drop-one-usefulness">3 · Drop-One (Usefulness)</a></li>
-  <li><a href="#shapley-values" id="toc-shapley-values" class="nav-link" data-scroll-target="#shapley-values">4 · Shapley Values</a></li>
+  <li><a href="#shapley-values-from-scratch" id="toc-shapley-values-from-scratch" class="nav-link" data-scroll-target="#shapley-values-from-scratch">4 · Shapley Values (from scratch)</a></li>
   <li><a href="#johnsons-relative-weights" id="toc-johnsons-relative-weights" class="nav-link" data-scroll-target="#johnsons-relative-weights">5 · Johnson’s Relative Weights</a></li>
-  <li><a href="#random-forest-gini-decrease" id="toc-random-forest-gini-decrease" class="nav-link" data-scroll-target="#random-forest-gini-decrease">6 · Random Forest Gini Decrease</a></li>
+  <li><a href="#random-forest-mean-decrease-in-gini" id="toc-random-forest-mean-decrease-in-gini" class="nav-link" data-scroll-target="#random-forest-mean-decrease-in-gini">6 · Random Forest Mean Decrease in Gini</a></li>
   </ul></li>
   <li><a href="#the-key-drivers-table" id="toc-the-key-drivers-table" class="nav-link" data-scroll-target="#the-key-drivers-table">The Key Drivers Table</a></li>
-  <li><a href="#visual-comparison-across-methods" id="toc-visual-comparison-across-methods" class="nav-link" data-scroll-target="#visual-comparison-across-methods">Visual Comparison Across Methods</a></li>
+  <li><a href="#visual-comparison-across-methods" id="toc-visual-comparison-across-methods" class="nav-link" data-scroll-target="#visual-comparison-across-methods">Visual Comparison Across Methods</a>
+  <ul class="collapse">
+  <li><a href="#importance-bars-by-method" id="toc-importance-bars-by-method" class="nav-link" data-scroll-target="#importance-bars-by-method">Importance Bars by Method</a></li>
+  <li><a href="#rank-bump-chart-where-methods-agree-and-disagree" id="toc-rank-bump-chart-where-methods-agree-and-disagree" class="nav-link" data-scroll-target="#rank-bump-chart-where-methods-agree-and-disagree">Rank Bump Chart: Where Methods Agree and Disagree</a></li>
+  <li><a href="#full-heatmap" id="toc-full-heatmap" class="nav-link" data-scroll-target="#full-heatmap">Full Heatmap</a></li>
+  </ul></li>
   <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a>
   <ul class="collapse">
-  <li><a href="#three-tiers-of-drivers" id="toc-three-tiers-of-drivers" class="nav-link" data-scroll-target="#three-tiers-of-drivers">Three Tiers of Drivers</a></li>
-  <li><a href="#why-methods-disagree" id="toc-why-methods-disagree" class="nav-link" data-scroll-target="#why-methods-disagree">Why Methods Disagree</a></li>
-  <li><a href="#what-each-method-is-good-for" id="toc-what-each-method-is-good-for" class="nav-link" data-scroll-target="#what-each-method-is-good-for">What Each Method Is Good For</a></li>
+  <li><a href="#the-top-line-story" id="toc-the-top-line-story" class="nav-link" data-scroll-target="#the-top-line-story">The Top-Line Story</a></li>
+  <li><a href="#why-the-methods-diverge-in-the-middle" id="toc-why-the-methods-diverge-in-the-middle" class="nav-link" data-scroll-target="#why-the-methods-diverge-in-the-middle">Why the Methods Diverge in the Middle</a></li>
+  <li><a href="#the-surprising-flatness-of-johnson-and-rf-gini" id="toc-the-surprising-flatness-of-johnson-and-rf-gini" class="nav-link" data-scroll-target="#the-surprising-flatness-of-johnson-and-rf-gini">The Surprising Flatness of Johnson and RF Gini</a></li>
+  <li><a href="#practical-recommendations" id="toc-practical-recommendations" class="nav-link" data-scroll-target="#practical-recommendations">Practical Recommendations</a></li>
+  <li><a href="#caveats" id="toc-caveats" class="nav-link" data-scroll-target="#caveats">Caveats</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -262,103 +269,94 @@ window.Quarto = {
 <p>This post applies six methods to the same dataset and compares what each tells us:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 32%">
-<col style="width: 68%">
+<col style="width: 26%">
+<col style="width: 73%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Method</th>
-<th>What it measures</th>
+<th>Core question answered</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Pearson correlation</td>
-<td>Raw linear association with satisfaction</td>
+<td>How strongly does this driver correlate with satisfaction?</td>
 </tr>
 <tr class="even">
-<td>Standardised regression coefficient</td>
-<td>Unique linear contribution, accounting for other drivers</td>
+<td>Standardised β</td>
+<td>How much does satisfaction change per SD of this driver, holding others fixed?</td>
 </tr>
 <tr class="odd">
 <td>Drop-one (usefulness)</td>
-<td>Unique contribution to R² when a driver is removed</td>
+<td>How much does R² fall if we remove this driver entirely?</td>
 </tr>
 <tr class="even">
 <td>Shapley values</td>
-<td>Fair allocation of R² using cooperative game theory</td>
+<td>What is each driver’s fair share of R², averaging over all entry orders?</td>
 </tr>
 <tr class="odd">
 <td>Johnson’s relative weights</td>
-<td>Orthogonal-rotation decomposition of R²</td>
+<td>What share of R² does each driver explain via orthogonal rotation?</td>
 </tr>
 <tr class="even">
 <td>Random forest Gini decrease</td>
-<td>Non-linear importance from an ensemble of trees</td>
+<td>How much does this driver reduce prediction error in an ensemble of trees?</td>
 </tr>
 </tbody>
 </table>
+<p>A key question motivating the comparison: <em>do all six methods tell the same story, or do they diverge — and if so, why?</em></p>
 </section>
-<section id="the-data" class="level2">
-<h2 class="anchored" data-anchor-id="the-data">The Data</h2>
-<div id="eb23d8e5" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Respondents: </span><span class="sc">{</span>n<span class="sc">:,}</span><span class="ss">   |   Brands: </span><span class="sc">{</span>df[<span class="st">'brand'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">   |   Drivers: </span><span class="sc">{</span>p<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Satisfaction scale: </span><span class="sc">{</span><span class="bu">int</span>(y.<span class="bu">min</span>())<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span><span class="bu">int</span>(y.<span class="bu">max</span>())<span class="sc">}</span><span class="ss">   |   Mean: </span><span class="sc">{</span>y<span class="sc">.</span>mean()<span class="sc">:.2f}</span><span class="ss">   |   SD: </span><span class="sc">{</span>y<span class="sc">.</span>std()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Driver variables (all binary 0/1):"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> c <span class="kw">in</span> PREDICTORS:</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>LABELS[c]<span class="sc">:&lt;20}</span><span class="ss">  mean = </span><span class="sc">{</span>df[c]<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="exploring-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-the-data">Exploring the Data</h2>
+<div id="8e5177ce" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Respondents: </span><span class="sc">{</span>n<span class="sc">:,}</span><span class="ss">   |   Brands: </span><span class="sc">{</span>df[<span class="st">'brand'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">   |   Satisfaction mean: </span><span class="sc">{</span>y<span class="sc">.</span>mean()<span class="sc">:.2f}</span><span class="ss">  SD: </span><span class="sc">{</span>y<span class="sc">.</span>std()<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Respondents: 2,553   |   Brands: 10   |   Drivers: 9
-Satisfaction scale: 1–5   |   Mean: 3.39   |   SD: 1.17
-
-Driver variables (all binary 0/1):
-  Trust                 mean = 0.550
-  Build Quality         mean = 0.462
-  Differentiated        mean = 0.335
-  Easy to Use           mean = 0.536
-  Appealing             mean = 0.451
-  Rewarding             mean = 0.451
-  Popular               mean = 0.536
-  Service               mean = 0.467
-  Impactful             mean = 0.331</code></pre>
+<pre><code>Respondents: 2,553   |   Brands: 10   |   Satisfaction mean: 3.39  SD: 1.17</code></pre>
 </div>
 </div>
-<p>The outcome variable is <strong>satisfaction</strong> (1–5 scale). All nine drivers are binary endorsements — a respondent either agreed that the brand has that quality (1) or not (0). The data pool responses across 10 brands; the analysis is at the pooled level.</p>
+<div id="72149851" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw5_files/figure-html/cell-4-output-1.png" width="1669" height="503" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Three things stand out from this initial look. First, satisfaction is <strong>left-skewed</strong> — most respondents rate 3–5, with relatively few giving 1–2, a typical pattern in brand-satisfaction surveys. Second, endorsement rates vary considerably across drivers: <strong>Trust</strong> and <strong>Service</strong> are frequently endorsed (≈ 47%), while <strong>Build Quality</strong> is the least endorsed (≈ 37%). Third, and most important for the analysis that follows: <strong>the nine drivers are all positively correlated with each other</strong> (the correlation matrix is orange everywhere, no blue). This means every driver that correlates with satisfaction also correlates with every other driver. Any method that does not correct for this overlap will double-count shared variance — and different methods handle the overlap differently, which is exactly why they disagree.</p>
 </section>
 <section id="six-methods-one-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="six-methods-one-dataset">Six Methods, One Dataset</h2>
 <section id="pearson-correlation" class="level3">
 <h3 class="anchored" data-anchor-id="pearson-correlation">1 · Pearson Correlation</h3>
 <p>The starting point: how strongly does each driver correlate with satisfaction?</p>
-<div id="8469580b" class="cell" data-execution_count="3">
+<div id="09ef72f6" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pearson <span class="op">=</span> {pr: stats.pearsonr(df[pr], y)[<span class="dv">0</span>] <span class="cf">for</span> pr <span class="kw">in</span> PREDICTORS}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Pearson correlation is easy to compute and explain, but it ignores that drivers share variance. If <strong>impact</strong> and <strong>trust</strong> are correlated, their individual correlations with satisfaction overlap — both appear important even when only one is causally driving the outcome.</p>
+<p>Pearson correlation is easy to compute and explain, but it <strong>ignores that drivers share variance</strong>. Because all nine attributes are positively correlated (as we just saw), each attribute’s correlation with satisfaction is partly explained by its co-movement with other important attributes.</p>
 <hr>
 </section>
 <section id="standardised-regression-coefficient" class="level3">
 <h3 class="anchored" data-anchor-id="standardised-regression-coefficient">2 · Standardised Regression Coefficient</h3>
-<p>Running a multiple regression with all drivers simultaneously controls for overlap. The <strong>standardised beta</strong> (regressing z-scored satisfaction on z-scored drivers) tells us how many standard deviations satisfaction changes per standard-deviation increase in each driver, <em>holding the other drivers fixed</em>.</p>
-<div id="989be0ad" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>std_beta <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    PREDICTORS,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    LinearRegression().fit(Xs, ys).coef_</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>r2_full <span class="op">=</span> LinearRegression().fit(X, y).score(X, y)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Full-model R² = </span><span class="sc">{</span>r2_full<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Running a multiple regression with all nine drivers simultaneously controls for overlap. The <strong>standardised beta</strong> tells us how many SD satisfaction moves per SD of each driver, <em>holding the other eight fixed</em>.</p>
+<div id="0d672bf5" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>std_beta <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(PREDICTORS,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                    LinearRegression().fit(Xs, ys).coef_))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>r2_full <span class="op">=</span> LinearRegression().fit(X, y).score(X, y)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Full-model R² = </span><span class="sc">{</span>r2_full<span class="sc">:.4f}</span><span class="ss">  (explains </span><span class="sc">{</span>r2_full<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">% of satisfaction variance)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Full-model R² = 0.1090</code></pre>
+<pre><code>Full-model R² = 0.1090  (explains 10.9% of satisfaction variance)</code></pre>
 </div>
 </div>
-<p>Standardised betas correctly account for multicollinearity, but they can be unstable when drivers are highly correlated — small data changes can flip signs and magnitudes.</p>
+<p>The model collectively explains about <strong>11% of satisfaction variance</strong> — modest but not unusual for a brand attribute survey. The low R² is itself informative: it suggests that the nine measured attributes do not fully capture what drives satisfaction; unobserved factors (word-of-mouth, pricing, competitor alternatives) account for most of the variance.</p>
 <hr>
 </section>
 <section id="drop-one-usefulness" class="level3">
 <h3 class="anchored" data-anchor-id="drop-one-usefulness">3 · Drop-One (Usefulness)</h3>
-<p>For each driver, we measure how much <strong>R² drops when that driver is removed</strong> from the full model. This quantity, sometimes called <em>usefulness</em>, isolates the unique predictive contribution of each variable.</p>
-<div id="e85a9d2d" class="cell" data-execution_count="5">
+<p>For each driver, we measure how much <strong>R² drops when that driver is removed</strong> from the full model.</p>
+<div id="fb804f2f" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>drop_one_raw <span class="op">=</span> {}</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, pr <span class="kw">in</span> <span class="bu">enumerate</span>(PREDICTORS):</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    X_drop <span class="op">=</span> np.delete(X, i, axis<span class="op">=</span><span class="dv">1</span>)</span>
@@ -368,24 +366,18 @@ Driver variables (all binary 0/1):
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>drop_one_pct <span class="op">=</span> {pr: v <span class="op">/</span> <span class="bu">sum</span>(drop_one_raw.values()) <span class="op">*</span> <span class="dv">100</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> pr, v <span class="kw">in</span> drop_one_raw.items()}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Drop-one is the most conservative measure of importance: it only credits a driver for what it contributes <em>uniquely</em>, beyond all other drivers. Highly redundant drivers — those whose predictive information is duplicated elsewhere — score near zero, even if they correlate strongly with satisfaction on their own.</p>
+<p>Drop-one is the most <strong>conservative</strong> importance measure: it credits a driver only for variance it contributes <em>uniquely</em>, beyond what all other drivers already explain. A driver that is redundant with others will score near zero even if it correlates substantially with satisfaction.</p>
 <hr>
 </section>
-<section id="shapley-values" class="level3">
-<h3 class="anchored" data-anchor-id="shapley-values">4 · Shapley Values</h3>
-<p>Shapley values originate in cooperative game theory. Each driver is a “player,” the team’s joint payoff is R², and Shapley values divide that payoff <strong>fairly</strong> — accounting for every possible order in which drivers could enter the model.</p>
-<p>For driver <span class="math inline">\(j\)</span>, its Shapley value is the average of its marginal contributions across all <span class="math inline">\(p!\)</span> orderings:</p>
-<p><span class="math display">\[
-\phi_j = \frac{1}{p!}\sum_{\text{all orderings}} \bigl[R^2(S^{j}_{+}) - R^2(S^{j}_{-})\bigr]
-\]</span></p>
-<p>where <span class="math inline">\(S^{j}_{+}\)</span> is the set of drivers entering before <span class="math inline">\(j\)</span> plus <span class="math inline">\(j\)</span> itself, and <span class="math inline">\(S^{j}_{-}\)</span> excludes <span class="math inline">\(j\)</span>.</p>
-<p>An equivalent, computationally convenient form averages over all subsets rather than orderings:</p>
+<section id="shapley-values-from-scratch" class="level3">
+<h3 class="anchored" data-anchor-id="shapley-values-from-scratch">4 · Shapley Values (from scratch)</h3>
+<p>Shapley values originate in cooperative game theory. The “game” is predicting satisfaction; the “players” are the nine drivers; the “payoff” is R². Shapley values divide R² <strong>fairly</strong> — each driver receives the average of its marginal contribution across every possible order in which drivers could enter the model.</p>
 <p><span class="math display">\[
 \phi_j = \sum_{S \subseteq P \setminus \{j\}} \frac{|S|!\,(p-|S|-1)!}{p!}\,\bigl[R^2(S \cup \{j\}) - R^2(S)\bigr]
 \]</span></p>
-<p>With <span class="math inline">\(p = 9\)</span> drivers there are <span class="math inline">\(2^9 = 512\)</span> subsets to evaluate — small enough to do exactly.</p>
-<div id="9468d07f" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pre-compute R² for every subset of drivers (512 total)</span></span>
+<p>With <span class="math inline">\(p = 9\)</span> drivers there are <span class="math inline">\(2^9 = 512\)</span> subsets to evaluate — small enough to compute exactly by brute force.</p>
+<div id="8d2e12fb" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cache R² for every subset (512 regressions)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>r2_cache <span class="op">=</span> {}</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(p <span class="op">+</span> <span class="dv">1</span>):</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> S <span class="kw">in</span> combinations(<span class="bu">range</span>(p), k):</span>
@@ -393,129 +385,121 @@ Driver variables (all binary 0/1):
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>            r2_cache[S] <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>            r2_cache[S] <span class="op">=</span> LinearRegression().fit(X[:, <span class="bu">list</span>(S)], y).score(</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                              X[:, <span class="bu">list</span>(S)], y)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                               X[:, <span class="bu">list</span>(S)], y)</span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute each driver's Shapley value</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Shapley value for each driver</span></span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>shapley_raw <span class="op">=</span> {}</span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, pr <span class="kw">in</span> <span class="bu">enumerate</span>(PREDICTORS):</span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    others <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(p) <span class="cf">if</span> i <span class="op">!=</span> j]</span>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    sv <span class="op">=</span> <span class="fl">0.0</span></span>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(p):</span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> S <span class="kw">in</span> combinations(others, k):</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>            weight  <span class="op">=</span> math.factorial(k) <span class="op">*</span> math.factorial(p <span class="op">-</span> k <span class="op">-</span> <span class="dv">1</span>) <span class="op">/</span> math.factorial(p)</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            S_plus  <span class="op">=</span> <span class="bu">tuple</span>(<span class="bu">sorted</span>(S <span class="op">+</span> (j,)))</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            sv     <span class="op">+=</span> weight <span class="op">*</span> (r2_cache[S_plus] <span class="op">-</span> r2_cache[S])</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>            w      <span class="op">=</span> math.factorial(k) <span class="op">*</span> math.factorial(p <span class="op">-</span> k <span class="op">-</span> <span class="dv">1</span>) <span class="op">/</span> math.factorial(p)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            S_plus <span class="op">=</span> <span class="bu">tuple</span>(<span class="bu">sorted</span>(S <span class="op">+</span> (j,)))</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            sv    <span class="op">+=</span> w <span class="op">*</span> (r2_cache[S_plus] <span class="op">-</span> r2_cache[S])</span>
 <span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    shapley_raw[pr] <span class="op">=</span> sv</span>
 <span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shapley values sum to: </span><span class="sc">{</span><span class="bu">sum</span>(shapley_raw.values())<span class="sc">:.4f}</span><span class="ss">  (R² = </span><span class="sc">{</span>r2_full<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>shapley_pct <span class="op">=</span> {pr: v <span class="op">/</span> <span class="bu">sum</span>(shapley_raw.values()) <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>               <span class="cf">for</span> pr, v <span class="kw">in</span> shapley_raw.items()}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>total_sv <span class="op">=</span> <span class="bu">sum</span>(shapley_raw.values())</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shapley values sum to: </span><span class="sc">{</span>total_sv<span class="sc">:.4f}</span><span class="ss">  ✓  (full-model R² = </span><span class="sc">{</span>r2_full<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>shapley_pct <span class="op">=</span> {pr: v <span class="op">/</span> total_sv <span class="op">*</span> <span class="dv">100</span> <span class="cf">for</span> pr, v <span class="kw">in</span> shapley_raw.items()}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Shapley values sum to: 0.1090  (R² = 0.1090)</code></pre>
+<pre><code>Shapley values sum to: 0.1090  ✓  (full-model R² = 0.1090)</code></pre>
 </div>
 </div>
-<p>By construction the Shapley values <strong>sum exactly to R²</strong> — they partition the explained variance cleanly across all drivers. Shared variance is divided proportionally: if impact and trust jointly explain 10 pp of R² and each contributes equally in isolation, each receives 5 pp.</p>
+<p>By construction, Shapley values <strong>sum exactly to R²</strong> and treat each driver fairly: when two drivers jointly explain variance that neither explains alone, they split the credit equally.</p>
 <hr>
 </section>
 <section id="johnsons-relative-weights" class="level3">
 <h3 class="anchored" data-anchor-id="johnsons-relative-weights">5 · Johnson’s Relative Weights</h3>
-<p>Johnson (2000) proposed an elegant closed-form approximation to Shapley values. The idea: rotate the predictor space into orthogonal components, regress satisfaction on those components, then rotate the R² contributions back to the original predictors.</p>
-<p><strong>Algorithm:</strong></p>
-<ol type="1">
-<li>Eigendecompose the predictor correlation matrix: <span class="math inline">\(\mathbf{R}_{XX} = \mathbf{P}\boldsymbol{\Lambda}\mathbf{P}^\top\)</span></li>
-<li>Construct orthogonal predictors: <span class="math inline">\(\mathbf{Z} = \mathbf{X}_\text{std}\,\mathbf{P}\boldsymbol{\Lambda}^{-1/2}\)</span></li>
-<li>Regress <span class="math inline">\(y\)</span> on <span class="math inline">\(\mathbf{Z}\)</span>: each column <span class="math inline">\(k\)</span> gets correlation <span class="math inline">\(r_k\)</span> with <span class="math inline">\(y\)</span></li>
-<li>Map <span class="math inline">\(r_k^2\)</span> back through the rotation: <span class="math inline">\(\varepsilon_j = \sum_k P_{jk}^2 \cdot r_k^2\)</span></li>
-</ol>
-<div id="af625a4a" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>R_xx <span class="op">=</span> np.corrcoef(Xs.T)                    <span class="co"># predictor correlation matrix</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>eigvals, eigvecs <span class="op">=</span> np.linalg.eigh(R_xx)    <span class="co"># eigendecomposition</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> Xs <span class="op">@</span> eigvecs <span class="op">@</span> np.diag(eigvals<span class="op">**</span>(<span class="op">-</span><span class="fl">0.5</span>)) <span class="co"># orthogonal components</span></span>
+<p>Johnson (2000) proposed a closed-form decomposition of R². The key idea: rotate the correlated predictors into orthogonal components, see how much each component predicts satisfaction, then rotate those contributions back to the original drivers.</p>
+<p><span class="math display">\[
+\varepsilon_j = \sum_{k=1}^{p} P_{jk}^2 \cdot r_k^2
+\qquad \text{where } r_k = \operatorname{Cor}(Z_k,\, y)
+\]</span></p>
+<div id="d5e19ba4" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>R_xx <span class="op">=</span> np.corrcoef(Xs.T)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>eigvals, eigvecs <span class="op">=</span> np.linalg.eigh(R_xx)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> Xs <span class="op">@</span> eigvecs <span class="op">@</span> np.diag(eigvals<span class="op">**</span>(<span class="op">-</span><span class="fl">0.5</span>))          <span class="co"># orthogonal components</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># r²(Z_k, y_std) for each component</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>r2_comp <span class="op">=</span> np.array([np.corrcoef(Z[:, k], ys)[<span class="dv">0</span>, <span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span> <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(p)])</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Map back to original predictors: epsilon_j = sum_k P_{jk}^2 * r2_comp[k]</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>johnson_raw <span class="op">=</span> {pr: <span class="bu">float</span>((eigvecs[i]<span class="op">**</span><span class="dv">2</span>) <span class="op">@</span> r2_comp)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>               <span class="cf">for</span> i, pr <span class="kw">in</span> <span class="bu">enumerate</span>(PREDICTORS)}</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Johnson weights sum to: </span><span class="sc">{</span><span class="bu">sum</span>(johnson_raw.values())<span class="sc">:.4f}</span><span class="ss">  (R² = </span><span class="sc">{</span>r2_full<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>johnson_pct <span class="op">=</span> {pr: v <span class="op">/</span> <span class="bu">sum</span>(johnson_raw.values()) <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>               <span class="cf">for</span> pr, v <span class="kw">in</span> johnson_raw.items()}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>r2_comp <span class="op">=</span> np.array([np.corrcoef(Z[:, k], ys)[<span class="dv">0</span>, <span class="dv">1</span>]<span class="op">**</span><span class="dv">2</span> <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(p)])</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>johnson_raw <span class="op">=</span> {pr: <span class="bu">float</span>((eigvecs[i]<span class="op">**</span><span class="dv">2</span>) <span class="op">@</span> r2_comp)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>               <span class="cf">for</span> i, pr <span class="kw">in</span> <span class="bu">enumerate</span>(PREDICTORS)}</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Johnson weights sum to: </span><span class="sc">{</span><span class="bu">sum</span>(johnson_raw.values())<span class="sc">:.4f}</span><span class="ss">  ✓  (R² = </span><span class="sc">{</span>r2_full<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>johnson_pct <span class="op">=</span> {pr: v <span class="op">/</span> <span class="bu">sum</span>(johnson_raw.values()) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>               <span class="cf">for</span> pr, v <span class="kw">in</span> johnson_raw.items()}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Johnson weights sum to: 0.1090  (R² = 0.1090)</code></pre>
+<pre><code>Johnson weights sum to: 0.1090  ✓  (R² = 0.1090)</code></pre>
 </div>
 </div>
-<p>Because the rotation distributes variance across all components, Johnson weights tend to be more <strong>uniform</strong> than Shapley values when predictors share a large common factor.</p>
 <hr>
 </section>
-<section id="random-forest-gini-decrease" class="level3">
-<h3 class="anchored" data-anchor-id="random-forest-gini-decrease">6 · Random Forest Gini Decrease</h3>
-<p>The first five methods all assume a <strong>linear</strong> relationship between drivers and satisfaction. A random forest makes no such assumption: it builds an ensemble of decision trees, and variable importance is measured by the total <strong>decrease in Gini impurity</strong> (for classification) or variance (for regression) when a variable is used to split nodes, averaged over all trees.</p>
-<div id="7d3bef2a" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestClassifier(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    n_estimators<span class="op">=</span><span class="dv">500</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_jobs<span class="op">=-</span><span class="dv">1</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>rf.fit(X, y.astype(<span class="bu">int</span>))</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>rf_gini_raw <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(PREDICTORS, rf.feature_importances_))</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>rf_gini_pct <span class="op">=</span> {pr: v <span class="op">*</span> <span class="dv">100</span> <span class="cf">for</span> pr, v <span class="kw">in</span> rf_gini_raw.items()}   <span class="co"># already sum to 1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="random-forest-mean-decrease-in-gini" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest-mean-decrease-in-gini">6 · Random Forest Mean Decrease in Gini</h3>
+<p>The first five methods assume a <strong>linear</strong> relationship. A random forest makes no linearity assumption: it grows an ensemble of decision trees, and each variable’s importance is the total <strong>reduction in Gini impurity</strong> when that variable is used as a split criterion, averaged across all trees.</p>
+<div id="b702ccd2" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestClassifier(n_estimators<span class="op">=</span><span class="dv">500</span>, random_state<span class="op">=</span><span class="dv">42</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>rf.fit(X, y.astype(<span class="bu">int</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>rf_gini_raw  <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(PREDICTORS, rf.feature_importances_))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>rf_gini_pct  <span class="op">=</span> {pr: v <span class="op">*</span> <span class="dv">100</span> <span class="cf">for</span> pr, v <span class="kw">in</span> rf_gini_raw.items()}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The Gini decrease captures non-linear and interaction effects invisible to regression-based methods. It also tends toward <strong>equal sharing</strong> when variables can substitute for each other in a tree split.</p>
+<p>The forest can capture non-linear effects and interactions invisible to regression. It also tends toward more <strong>uniform</strong> importance when variables are substitutable in tree splits.</p>
 </section>
 </section>
 <section id="the-key-drivers-table" class="level2">
 <h2 class="anchored" data-anchor-id="the-key-drivers-table">The Key Drivers Table</h2>
-<div id="9e0bac33" class="cell" data-execution_count="9">
-<div class="cell-output cell-output-display" data-execution_count="9">
-<div id="ouofftjymf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="fae95994" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div id="zoybbqoifk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
-#ouofftjymf table {
+#zoybbqoifk table {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#ouofftjymf thead, tbody, tfoot, tr, td, th { border-style: none; }
+#zoybbqoifk thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#ouofftjymf p { margin: 0; padding: 0; }
- #ouofftjymf .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #ouofftjymf .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #ouofftjymf .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #ouofftjymf .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #ouofftjymf .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #ouofftjymf .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ouofftjymf .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #ouofftjymf .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #ouofftjymf .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #ouofftjymf .gt_column_spanner_outer:first-child { padding-left: 0; }
- #ouofftjymf .gt_column_spanner_outer:last-child { padding-right: 0; }
- #ouofftjymf .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #ouofftjymf .gt_spanner_row { border-bottom-style: hidden; }
- #ouofftjymf .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #ouofftjymf .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #ouofftjymf .gt_from_md> :first-child { margin-top: 0; }
- #ouofftjymf .gt_from_md> :last-child { margin-bottom: 0; }
- #ouofftjymf .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #ouofftjymf .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #ouofftjymf .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #ouofftjymf .gt_row_group_first td { border-top-width: 2px; }
- #ouofftjymf .gt_row_group_first th { border-top-width: 2px; }
- #ouofftjymf .gt_striped { color: #333333; background-color: #F4F4F4; }
- #ouofftjymf .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #ouofftjymf .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #ouofftjymf .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #ouofftjymf .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #ouofftjymf .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #ouofftjymf .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #ouofftjymf .gt_left { text-align: left; }
- #ouofftjymf .gt_center { text-align: center; }
- #ouofftjymf .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #ouofftjymf .gt_font_normal { font-weight: normal; }
- #ouofftjymf .gt_font_bold { font-weight: bold; }
- #ouofftjymf .gt_font_italic { font-style: italic; }
- #ouofftjymf .gt_super { font-size: 65%; }
- #ouofftjymf .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #ouofftjymf .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#zoybbqoifk p { margin: 0; padding: 0; }
+ #zoybbqoifk .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #zoybbqoifk .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #zoybbqoifk .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #zoybbqoifk .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #zoybbqoifk .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #zoybbqoifk .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #zoybbqoifk .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #zoybbqoifk .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #zoybbqoifk .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #zoybbqoifk .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #zoybbqoifk .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #zoybbqoifk .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #zoybbqoifk .gt_spanner_row { border-bottom-style: hidden; }
+ #zoybbqoifk .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #zoybbqoifk .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #zoybbqoifk .gt_from_md> :first-child { margin-top: 0; }
+ #zoybbqoifk .gt_from_md> :last-child { margin-bottom: 0; }
+ #zoybbqoifk .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #zoybbqoifk .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #zoybbqoifk .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #zoybbqoifk .gt_row_group_first td { border-top-width: 2px; }
+ #zoybbqoifk .gt_row_group_first th { border-top-width: 2px; }
+ #zoybbqoifk .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #zoybbqoifk .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #zoybbqoifk .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #zoybbqoifk .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #zoybbqoifk .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #zoybbqoifk .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #zoybbqoifk .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #zoybbqoifk .gt_left { text-align: left; }
+ #zoybbqoifk .gt_center { text-align: center; }
+ #zoybbqoifk .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #zoybbqoifk .gt_font_normal { font-weight: normal; }
+ #zoybbqoifk .gt_font_bold { font-weight: bold; }
+ #zoybbqoifk .gt_font_italic { font-style: italic; }
+ #zoybbqoifk .gt_super { font-size: 65%; }
+ #zoybbqoifk .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #zoybbqoifk .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 
@@ -525,20 +509,21 @@ Driver variables (all binary 0/1):
 <td colspan="7" class="gt_heading gt_title gt_font_normal">Key Drivers of Customer Satisfaction</td>
 </tr>
 <tr class="gt_heading even">
-<td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">n = 2,553 respondents · full-model R² = 0.109 · sorted by Shapley value</td>
+<td colspan="7" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">n = 2,553 respondents across 10 brands · full-model R² = 0.109 · sorted by Shapley value</td>
 </tr>
 <tr class="gt_col_headings gt_spanner_row header">
-<th rowspan="2" id="Predictor" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Predictor</th>
-<th colspan="5" id="Linear-methods" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">Linear methods</span></th>
-<th id="Tree-based" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="col"><span class="gt_column_spanner">Tree-based</span></th>
+<th rowspan="2" id="Driver" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Driver</th>
+<th colspan="2" id="Correlation-/-Regression" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">Correlation / Regression</span></th>
+<th colspan="3" id="R²-Decomposition--(%-of-total-R²)" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><span class="gt_column_spanner">R² Decomposition (% of total R²)</span></th>
+<th id="Non-linear" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="col"><span class="gt_column_spanner">Non-linear</span></th>
 </tr>
 <tr class="gt_col_headings even">
 <th id="Pearson-r" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Pearson r</th>
-<th id="Std.-Beta" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Std. Beta</th>
-<th id="Drop-one-%" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Drop-one %</th>
-<th id="Shapley-%" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Shapley %</th>
-<th id="Johnson-%" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Johnson %</th>
-<th id="RF-Gini-%" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">RF Gini %</th>
+<th id="Std.-β" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Std. β</th>
+<th id="Drop-one" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Drop-one</th>
+<th id="Shapley" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Shapley</th>
+<th id="Johnson" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">Johnson</th>
+<th id="RF-Gini" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold" scope="col">RF Gini</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
@@ -561,13 +546,13 @@ Driver variables (all binary 0/1):
 <td class="gt_row gt_right" style="background-color: #FEF9E7">9.6%</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left">Service</td>
-<td class="gt_row gt_right">0.251</td>
-<td class="gt_row gt_right">0.088</td>
-<td class="gt_row gt_right">17.9%</td>
-<td class="gt_row gt_right">16.9%</td>
-<td class="gt_row gt_right">12.9%</td>
-<td class="gt_row gt_right">10.0%</td>
+<td class="gt_row gt_left" style="background-color: #EAFAF1">Service</td>
+<td class="gt_row gt_right" style="background-color: #EAFAF1">0.251</td>
+<td class="gt_row gt_right" style="background-color: #EAFAF1">0.088</td>
+<td class="gt_row gt_right" style="background-color: #EAFAF1">17.9%</td>
+<td class="gt_row gt_right" style="background-color: #EAFAF1">16.9%</td>
+<td class="gt_row gt_right" style="background-color: #EAFAF1">12.9%</td>
+<td class="gt_row gt_right" style="background-color: #EAFAF1">10.0%</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left">Easy to Use</td>
@@ -633,73 +618,104 @@ Driver variables (all binary 0/1):
 </section>
 <section id="visual-comparison-across-methods" class="level2">
 <h2 class="anchored" data-anchor-id="visual-comparison-across-methods">Visual Comparison Across Methods</h2>
-<div id="d0b62b56" class="cell" data-execution_count="10">
+<section id="importance-bars-by-method" class="level3">
+<h3 class="anchored" data-anchor-id="importance-bars-by-method">Importance Bars by Method</h3>
+<div id="a5b2a8af" class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="hw5_files/figure-html/cell-11-output-1.png" width="1805" height="707" class="figure-img"></p>
+<p><img src="hw5_files/figure-html/cell-12-output-1.png" width="1805" height="707" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="3dd921b0" class="cell" data-execution_count="11">
+</section>
+<section id="rank-bump-chart-where-methods-agree-and-disagree" class="level3">
+<h3 class="anchored" data-anchor-id="rank-bump-chart-where-methods-agree-and-disagree">Rank Bump Chart: Where Methods Agree and Disagree</h3>
+<p>A bump chart traces each driver’s <em>rank</em> across the four importance methods. Stable horizontal lines mean the methods agree; crossing lines reveal disagreement.</p>
+<div id="26bf2e1f" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="hw5_files/figure-html/cell-12-output-1.png" width="1156" height="575" class="figure-img"></p>
+<p><img src="hw5_files/figure-html/cell-13-output-1.png" width="1005" height="702" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="full-heatmap" class="level3">
+<h3 class="anchored" data-anchor-id="full-heatmap">Full Heatmap</h3>
+<div id="4e917bde" class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw5_files/figure-html/cell-14-output-1.png" width="1149" height="607" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="discussion" class="level2">
 <h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
-<section id="three-tiers-of-drivers" class="level3">
-<h3 class="anchored" data-anchor-id="three-tiers-of-drivers">Three Tiers of Drivers</h3>
-<p>All six methods consistently identify the same top tier: <strong>Impactful</strong> and <strong>Trust</strong> are the primary drivers of satisfaction, with <strong>Service</strong> in a clear third place. The remaining six attributes fill a lower tier, with <strong>Popular</strong> and <strong>Rewarding</strong> consistently at the bottom.</p>
-<p>The differences between methods appear in the <em>magnitudes</em> and the <em>sharpness</em> of the contrast between top and bottom drivers.</p>
+<section id="the-top-line-story" class="level3">
+<h3 class="anchored" data-anchor-id="the-top-line-story">The Top-Line Story</h3>
+<p>All six methods agree on the <strong>top three drivers</strong>: <strong>Impactful</strong>, <strong>Trust</strong>, and <strong>Service</strong> are the primary levers for customer satisfaction. This agreement across very different estimation methods is meaningful — it is unlikely to be an artefact of any single method’s assumptions.</p>
+<p>The ranking within the top three does depend on the method. Shapley and drop-one both put <strong>Impactful</strong> first and <strong>Trust</strong> second; Pearson correlation reverses them slightly; the RF Gini places <strong>Service</strong> above both. The business-level implication is the same regardless: <em>if the brand manager has resources to invest in one or two attributes, Impactful and Trust are the clear priority</em>.</p>
 </section>
-<section id="why-methods-disagree" class="level3">
-<h3 class="anchored" data-anchor-id="why-methods-disagree">Why Methods Disagree</h3>
-<p><strong>Drop-one is the most extreme.</strong> It credits Impact with 43% of all importance, Trust with 31%, and Service with 18% — leaving the remaining six attributes sharing less than 8% combined. This reflects its design: drop-one measures <em>unique</em> contribution. A driver that is correlated with other important drivers receives almost no credit, even if it is genuinely associated with satisfaction.</p>
-<p><strong>Shapley gives a balanced but differentiated picture.</strong> By averaging contributions across all possible entry orders, Shapley shares credit for overlapping variance. Impact (21.6%), Trust (19.8%), and Service (16.9%) still lead, but the gap to the middle tier is much smaller. This is the method that most closely resembles what a fair “audit” of R² should look like.</p>
-<p><strong>Johnson’s relative weights are the flattest.</strong> The orthogonal-rotation approach distributes weight more uniformly when predictors share a large common factor. Here the nine binary attributes are moderately correlated (all positive product-quality signals), so Johnson assigns 8–13% to each driver — almost no information for distinguishing primary from secondary drivers.</p>
-<p><strong>The random forest is even flatter.</strong> The Gini-decrease rankings (9–13%) are nearly uniform, suggesting that the tree ensemble can use any of the nine attributes interchangeably to split nodes. This is consistent with a data-generating process that has a strong common factor (overall brand quality) captured redundantly by all nine items.</p>
+<section id="why-the-methods-diverge-in-the-middle" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-methods-diverge-in-the-middle">Why the Methods Diverge in the Middle</h3>
+<p>The bump chart shows the most disagreement for the middle-tier drivers (<strong>Easy</strong>, <strong>Appealing</strong>, <strong>Differentiated</strong>, <strong>Build Quality</strong>, <strong>Rewarding</strong>). The drop-one method assigns these almost no importance (together sharing &lt; 8% of total), while Shapley gives them 6–9% each.</p>
+<p>The explanation is rooted in the correlation matrix: <strong>all nine attributes are positively correlated</strong> with each other. This means each middle-tier attribute’s predictive information is largely redundant with information already provided by the top-tier attributes. Drop-one — which measures only <em>unique</em> contribution — credits them almost nothing. Shapley — which averages over all entry orders, including many where the middle-tier attributes enter <em>before</em> the top-tier ones — gives them credit for their marginal contribution in those orderings.</p>
+<p>Neither answer is “wrong”: they answer different questions. Drop-one asks “what does this driver add beyond everything else?” Shapley asks “on average, what share of the outcome does this driver explain?”</p>
 </section>
-<section id="what-each-method-is-good-for" class="level3">
-<h3 class="anchored" data-anchor-id="what-each-method-is-good-for">What Each Method Is Good For</h3>
+<section id="the-surprising-flatness-of-johnson-and-rf-gini" class="level3">
+<h3 class="anchored" data-anchor-id="the-surprising-flatness-of-johnson-and-rf-gini">The Surprising Flatness of Johnson and RF Gini</h3>
+<p>What caught me off-guard is how <strong>similar</strong> all nine drivers look under Johnson’s relative weights and the RF Gini (ranging only 8–13%). Given that drop-one shows Impact at 43% and Rewarding at 0.1%, I expected more differentiation.</p>
+<p>For Johnson: the orthogonal rotation smears variance across all nine components, and the final rotation back produces near-uniform weights — a mathematical consequence of high pairwise correlations in the predictor matrix.</p>
+<p>For the random forest: decision trees can achieve the same split quality using any one of several correlated attributes. If “Impact” is unavailable, the forest simply switches to “Trust,” so the <em>marginal</em> importance of any single attribute is modest. This suggests the forest has effectively discovered the same high-collinearity structure that makes regression betas unstable.</p>
+</section>
+<section id="practical-recommendations" class="level3">
+<h3 class="anchored" data-anchor-id="practical-recommendations">Practical Recommendations</h3>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Goal</th>
-<th>Best method</th>
+<th>Stakeholder need</th>
+<th>Method to report</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Quick descriptive summary</td>
-<td>Pearson r</td>
+<td>Executive dashboard (“quick ranking”)</td>
+<td>Pearson r or Shapley %</td>
 </tr>
 <tr class="even">
-<td>Controlling for redundancy (unique contribution)</td>
+<td>Budget allocation (“what’s unique?”)</td>
 <td>Drop-one</td>
 </tr>
 <tr class="odd">
-<td>Fair attribution accounting for shared variance</td>
+<td>Fair attribution (“what does each driver contribute?”)</td>
 <td>Shapley values</td>
 </tr>
 <tr class="even">
-<td>Fast approximation of Shapley</td>
-<td>Johnson relative weights</td>
+<td>Robustness check</td>
+<td>Compare Shapley vs.&nbsp;Pearson r — large gaps flag collinearity</td>
 </tr>
 <tr class="odd">
-<td>Non-linear / interaction effects</td>
-<td>RF Gini decrease</td>
+<td>Testing non-linear effects</td>
+<td>RF Gini</td>
 </tr>
 </tbody>
 </table>
-<p>For this dataset, the three linear methods that correct for multicollinearity (standardised beta, drop-one, Shapley) converge on the same story: <strong>Impact and Trust are the priority levers for improving satisfaction</strong>. Service matters too but is a distant third. The remaining six attributes are unlikely to move the needle if resources are limited.</p>
-<p>The RF Gini result serves as a useful robustness check: even a non-linear model with 500 trees finds it difficult to distinguish the drivers, which suggests the true signal in this data is modest (R² ≈ 0.11) and spread across correlated attributes rather than concentrated in one or two.</p>
+<p>For this brand satisfaction study, the practical advice is: <strong>focus investment on Impactful and Trust first, then Service</strong> — this recommendation survives across every method. The remaining six attributes can be treated as a secondary tier where any improvement is helpful but unlikely to move the satisfaction needle substantially.</p>
+</section>
+<section id="caveats" class="level3">
+<h3 class="anchored" data-anchor-id="caveats">Caveats</h3>
+<p>The analysis pools respondents across 10 brands, which may mask important heterogeneity — the key drivers for a premium brand are likely different from those of a discount brand. A natural extension would be to run brand-specific analyses or a hierarchical model. Additionally, with R² ≈ 0.11, the nine measured attributes explain only a fraction of satisfaction variance, suggesting important unobserved factors (price, word-of-mouth, competitive alternatives) that no key driver analysis on these items alone can capture.</p>
 
 
 </section>
